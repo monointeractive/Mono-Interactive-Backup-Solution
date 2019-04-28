@@ -1,6 +1,7 @@
 addToCompile/
 compile/
 ignore/
+exclude/
 addToCompile/ffmpeg.dll
 addToCompile/icudtl.dat
 addToCompile/locales/en-US.pak
