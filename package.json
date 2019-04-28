@@ -1,0 +1,15 @@
+{
+  "name": "MBS",
+  "id":"Mono Interactive Backup Solution",
+  "version":1,
+  "main": "./app/index.html",
+  "chromium-args": "--allow-running-insecure-content --disable-web-security",
+   "permissions": ["<local>","<remote>","<all_urls>","chrome-extension://*", "file:///*", "http://*/*", "https://*/*" ],  
+  "window": {
+	"title":"Mono Interactive Backup Solution",
+	"icon":"app/icons/default.png",
+	"width":1024,
+	"height":600,
+    "show": false
+  }
+} 

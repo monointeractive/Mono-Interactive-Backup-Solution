@@ -1,0 +1,96 @@
+.disableModalElementMargin > :first-child, .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-body > :first-child {
+  margin-top: 0px; }
+.disableModalElementMargin > :last-child, .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-body > :last-child {
+  margin-bottom: 0px; }
+
+body[data-monobox-open] .monobox {
+  background-color: rgba(0, 0, 0, 0.14);
+  transition: background-color 1s ease-in-out; }
+
+.monobox {
+  transition: background-color 1s ease-in-out;
+  background-color: rgba(0, 0, 0, 0);
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  z-index: 1051;
+  overflow: auto;
+  overflow-x: hidden;
+  width: 100vw; }
+  .monobox > .monobox-container {
+    width: 100%;
+    height: 100%;
+    display: table; }
+    .monobox > .monobox-container > .monobox-hbox {
+      display: table-row; }
+      .monobox > .monobox-container > .monobox-hbox > .monobox-vbox {
+        width: 100%;
+        height: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center; }
+        .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog {
+          display: inline-block;
+          padding: 15px;
+          text-align: left; }
+          .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content {
+            box-shadow: 0 2px 13px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border-radius: 6px;
+            max-width: 1000px;
+            background-color: white; }
+            .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header {
+              display: table;
+              width: 100%;
+              text-align: left;
+              vertical-align: top; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header > div:empty {
+                display: none; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header > .monobox-title {
+                padding: 15px;
+                border-bottom: 1px solid #e8e8e8;
+                font-weight: bold;
+                font-size: 18px;
+                display: table-cell; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header > .monobox-close {
+                padding: 15px;
+                border-bottom: 1px solid #e8e8e8;
+                display: table-cell;
+                text-align: right;
+                padding-left: 15px; }
+                .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header > .monobox-close > a {
+                  font-weight: bold;
+                  display: block;
+                  margin-top: -2px;
+                  font-size: 26px;
+                  line-height: 1;
+                  color: #d0caca;
+                  text-decoration: none; }
+                  .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header > .monobox-close > a:hover {
+                    color: black; }
+            .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-body {
+              border-bottom: 1px solid #e8e8e8;
+              padding: 15px; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-body:empty {
+                display: none; }
+            .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-footer {
+              display: table;
+              width: 100%; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-footer > div:empty {
+                display: none; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-footer > .monobox-description {
+                padding: 15px;
+                vertical-align: middle;
+                display: table-cell; }
+              .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-footer > .monobox-buttons {
+                padding: 15px;
+                vertical-align: middle;
+                white-space: nowrap;
+                text-align: right;
+                display: table-cell; }
+                .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-footer > .monobox-buttons > button {
+                  margin-right: 5px; }
+                  .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-footer > .monobox-buttons > button:last-child {
+                    margin-right: 0px; }
