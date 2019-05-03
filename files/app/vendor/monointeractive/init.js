@@ -66,7 +66,8 @@ if(nodeEnv){
 	if(path.basename(userDir).toLowerCase()=='user data') userDir = path.dirname(userDir);
 	
 	guiApp.on("open", function(args){
-	
+		win.restore();
+		win.show();
 	});
 
 	window.addEventListener('error', function(e) { 
