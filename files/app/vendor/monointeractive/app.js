@@ -22,12 +22,14 @@ var app = new (function(){
 	}
 	scope.exit = function(){
 		try{ config.save();} catch(err){}
+		try{ if(typeof tray =='object' && tray.remove) tray.remove();} catch(err){}
 		try{ process.exit();} catch(err){}
 	}
 	scope.restart = function(){		
-		var restartProcess = spawn(process.execPath, { detached: true, stdio: ['ignore'] });
-		restartProcess.unref();
-		scope.exit();
+		var restartProcess = spawn(process.execPath, { env:$.extend(true,process.env,{wait:3}),detached: true, windowsHide:false,stdio: ['ignore'] }).unref();
+		try{ if(typeof tray =='object' && tray.remove) tray.remove();} catch(err){}
+		try{process.kill(process.pid);} catch(err){};
+		try{scope.exit();} catch(err){};
 	}	
 	scope.restartIdleTimer = function(){
 		var child = scope.idleTimeProcess;
