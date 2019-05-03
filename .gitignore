@@ -7,3 +7,5 @@ addToCompile/icudtl.dat
 addToCompile/locales/en-US.pak
 addToCompile/locales/en-GB.pak
 addToCompile/nw.dll
+files/mbs_updater.dat.tmp
+*.tmp
