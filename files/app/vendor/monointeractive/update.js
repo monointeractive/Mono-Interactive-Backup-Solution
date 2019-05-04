@@ -3,7 +3,7 @@ var update = new runAndLog({
 	id:'update',
 	exec:path.join(execDir,'mbs_updater.exe'),
 	params:{
-		env:{runafterupdate:process.execPath,killpid:process.pid}
+		env:{targetDir:path.join(execDir,'updates')}
 	}
 });
 

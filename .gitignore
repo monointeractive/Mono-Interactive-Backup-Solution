@@ -1,5 +1,6 @@
 addToCompile/
 compile/
+updates/
 ignore/
 exclude/
 addToCompile/ffmpeg.dll
