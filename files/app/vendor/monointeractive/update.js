@@ -1,7 +1,8 @@
 var update = new runAndLog({
 	title:'Update progress',
 	id:'update',
-	exec:path.join(execDir,'mbs_updater.exe')
+	exec:path.join(execDir,'mbs_updater.exe'),
+	env:{runafterupdate:process.execPath,killpid:process.pid;}
 });
 
 update.events.on('start',function(){

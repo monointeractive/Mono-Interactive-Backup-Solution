@@ -9,7 +9,7 @@ var backup = new runAndLog({
 		env.logFileDir = this.getLogFileDir();
 		env.configPath = config.path;
 		this.config.params = {env:env,stdio: ['pipe']};
-	},
+	}, 
 	onBeforeAddEntry: function(entryEl){
 		$(entryEl).each(function(){
 			var text = ($(this).attr('title') || '').toLowerCase();
