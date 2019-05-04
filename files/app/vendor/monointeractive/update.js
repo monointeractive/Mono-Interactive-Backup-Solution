@@ -3,10 +3,12 @@ var update = new runAndLog({
 	id:'update',
 	exec:path.join(execDir,'mbs_updater.exe'),
 	params:{
-		env:{targetDir:path.join(execDir,'updates')}
+		env:{
+			targetDir:path.join(execDir,'updates')
+		}
 	}
 });
-
+ 
 update.events.on('start',function(){
 	tray.changeIcon('backup');	
 });
