@@ -1,6 +1,0 @@
-option batch on
-option reconnecttime 3
-echo Prepare to synchronize | "%backupDir%" > "%remoteDir%"
-open %serverUrl%
-synchronize remote -resumesupport=on -nopermissions -mirror -criteria=either -filemask="*.zip>7D; *.txt>7D; *.log>7D" "%backupDir%" "%remoteDir%"
-exit

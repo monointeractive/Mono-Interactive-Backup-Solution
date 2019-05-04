@@ -1,14 +1,14 @@
 var backup = new runAndLog({
 	title:'Backup progress',
 	id:'backup',
-	exec:path.join(binDir,'php','php.exe'),
-	args:['-f',path.join(binDir,'php','start.php'),'-c',path.join(binDir,'php','php.ini')],//,'-d','extension_dir='+path.join(binDir,'php','ext')],	
+	exec:path.join(binDir,'mbs_scan.exe'),
+	args:[],
 	onBeforeStart: function(){
 		var env = $.extend({},process.env);		
 		env.userBackupDir = this.getUserBackupDir();
 		env.logFileDir = this.getLogFileDir();
 		env.configPath = config.path;
-		this.config.params = {cwd:path.join(binDir,'php'),env:env,stdio: ['pipe']};
+		this.config.params = {env:env,stdio: ['pipe']};
 	},
 	onBeforeAddEntry: function(entryEl){
 		$(entryEl).each(function(){

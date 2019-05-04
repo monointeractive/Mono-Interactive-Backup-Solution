@@ -1,7 +1,7 @@
 var sync = new runAndLog({
 	title:'Sync progress',
 	id:'sync',
-	exec:path.join(binDir,'winscp','winscp.com'),
+	exec:path.join(binDir,'mbs_sync.exe'),
 	onBeforeStart:function(){
 		this.config.userBackupDir = backup.getUserBackupDir();
 		this.config.syncBackupDir = path.dirname(this.config.userBackupDir);
@@ -9,13 +9,9 @@ var sync = new runAndLog({
 		if(!fs.existsSync(logDir)) return showNotify({title:'No backup found in path ',message:this.config.userBackupDir});
 		var serverConfig = $.extend({},(config.data.server || {}));
 		if(typeof serverConfig.type =='string' && serverConfig.type.length && typeof serverConfig.user =='string' && serverConfig.user.length && typeof serverConfig.host =='string' && serverConfig.host.length){
-			this.config.args = [
-				'/log='+path.join(logDir,'transfer-'+moment().format("YYYYMMDD")+'.log'),
-				'/ini=nul',
-				'/script='+path.join(binDir,'winscp','sync.txt')+''
-			],	
 			this.config.params = {cwd:path.dirname(config.path),stdio: ['pipe']};			
 			var env = $.extend({},process.env);
+			env.logPath = path.join(logDir,'transfer-'+moment().format("YYYYMMDD")+'.log');
 			env.backupDir = this.config.syncBackupDir;
 			serverConfig.pass = $.trim(serverConfig.pass);
 			serverConfig.port = _parseInt(serverConfig.port);

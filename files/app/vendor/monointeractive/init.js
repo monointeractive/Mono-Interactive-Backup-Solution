@@ -55,7 +55,7 @@ if(nodeEnv){
 	var exec = child_process.exec;
 	var execSync = child_process.execSync;
 	var currentDir = process.cwd();
-	var clipboard = gui.Clipboard.get();
+	var clipboard = gui.Clipboard.get(); 
 	var __dirname = path.resolve();	
 	var execDir = path.dirname(process.execPath);	
 	var cwd = process.cwd();

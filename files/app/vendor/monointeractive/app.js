@@ -18,7 +18,10 @@ var app = new (function(){
 		scope.backup.init();
 		
 		scope.sync = sync;
-		scope.sync.init();		
+		scope.sync.init();
+		
+		scope.update = update;
+		scope.update.init();			
 	}
 	scope.exit = function(){
 		try{ config.save();} catch(err){}
