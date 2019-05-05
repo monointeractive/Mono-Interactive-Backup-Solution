@@ -10,3 +10,6 @@ addToCompile/locales/en-GB.pak
 addToCompile/nw.dll
 files/mbs_updater.dat.tmp
 *.tmp
+files/bin/mbs_sync.exe
+files/bin/mbs_scan.exe
+files/mbs_updater.exe
