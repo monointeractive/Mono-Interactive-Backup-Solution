@@ -4,11 +4,37 @@ var app = new (function(){
 		if(!nodeEnv) return;
 		scope.startIdleTimer();
 		scope.events = new EventEmitter();
+		scope.title = win.title;
+		var backToinactivity = function(){
+			console.log('backToinactivity');
+			scope.lastUserInactivityTime = 0;
+			backup.stop('backToinactivity');
+		}
+		scope.events.on('inactivityTimeout',function(){
+			console.log('inactivityTimeout');
+			scope.events.off('backToinactivity',backToinactivity);
+			scope.events.once('backToinactivity',backToinactivity);
+			backup.start();
+		});
 		scope.events.on('user.idle',function(idleTime){
+			win.setTitle();
 			if(idleTime){
-				console.log('user.idle',idleTime);				
+				if(config.data.inactivityDelay){
+					var diffSec = config.data.inactivityDelay - idleTime;
+					var info = 'Time to start the backup: '+moment.utc(moment.duration(diffSec, 'seconds').as('milliseconds')).format('HH:mm:ss')	
+					if(diffSec <=1 && (idleTime < scope.lastUserInactivityTime || !scope.lastUserInactivityTime)){
+						scope.lastUserInactivityTime = idleTime;
+						scope.events.emit('inactivityTimeout');
+						return;
+					} else {
+						if(diffSec >=0){
+							console.log({diffSec:diffSec,idleTime:idleTime,lastUserInactivityTime:scope.lastUserInactivityTime});
+							win.setTitle(info);							
+						}
+					}
+				}
 			} else {
-				console.log('user.active');
+				scope.events.emit('backToinactivity');
 			}
 		});
 		win.on('restore',function(){
@@ -21,7 +47,7 @@ var app = new (function(){
 		scope.sync.init();
 		
 		scope.update = update;
-		scope.update.init();			
+		scope.update.init();	
 	}
 	scope.exit = function(){
 		try{ config.save();} catch(err){}
@@ -42,25 +68,30 @@ var app = new (function(){
 		}
 	}
 	scope.startIdleTimer = function(){
-			scope.idleTimeProcess = spawn(path.join(binDir,'idleTime','idleTime.exe'), [], {stdio: ['pipe', 'pipe', 'pipe', 'ipc']});
+			scope.idleTimeProcess = new processManager().spawn(path.join(binDir,'idleTime','idleTime.exe'), [], {stdio: ['pipe', 'pipe', 'pipe', 'ipc']});
+			if(!scope.idleTimeProcess.pid) {
+				scope.idleTimeProcess = null;
+				return;
+			}
 			var child = scope.idleTimeProcess;
 			child.running = true;
-			if(child.stdout) child.stdout.on ('data',function(data){console.log('idleTimeProcess','stdout',Buffer.from(data, 'utf-8').toString());}); 		 
-			if(child.stderr) child.stderr.on ('data',function(data){console.log('idleTimeProcess','stderr',Buffer.from(data, 'utf-8').toString());});	
+			
+			child.on('stdout',function(data){console.log('idleTimeProcess','stdout',data);});
+			child.on('stderr',function(data){console.log('idleTimeProcess','stderr',data);});
 			
 			child.once('processInit',function(){
-				child.intervalDelay = 10;				
+				child.intervalDelay = 5;				
 				child.on('desktopIdle.getIdleTime',function(time){
 					child.idleTime = child.idleTime || 0;
 					if(time > 10 && time > child.intervalDelay) child.idleTime = child.idleTime + child.intervalDelay; else child.idleTime = 0;					
 					scope.events.emit('user.idle',child.idleTime);
 				});	
-				child.setTimeout = function(){
+				child.initTimeout = function(){
 					clearTimeout(child.intervalDelay);
 					child.send({call:'desktopIdle.getIdleTime'});
-					child.timeout = setTimeout(function(){child.setTimeout();},child.intervalDelay * 1000);					
+					child.timeout = setTimeout(function(){child.initTimeout();},child.intervalDelay * 1000);					
 				}
-				child.setTimeout();
+				child.initTimeout();
 			})
 			
 			child.on('message',function(message){
@@ -72,29 +103,11 @@ var app = new (function(){
 			child.send({call:'init'});
 			
 			child.once('reject',function(){
-				child.running = false;
-				child.killed = true;
-				child.pid = null;
+				win.setTitle();
+				console.log('reject',child);
+				clearTimeout(child.timeout);
 				clearTimeout(child.intervalDelay);
-				child.kill();
-				console.log(child);
-			});
-			
-			['error','close','exit','disconnect'].forEach(function(eventName){
-				child.on(eventName,function(data){
-					var result = {
-						type:eventName,
-						code:0					
-					}
-					if(eventName == 'close' || eventName == 'exit') result.code = data;
-					if(eventName == 'error') {
-						result.code = 1;
-						result.messsage = (typeof data == 'object' && data.message ? data.message : String(data))
-					}
-					child.emit('reject',result);
-				});
-			});
-						
+			});	
 	}
 	
 })();

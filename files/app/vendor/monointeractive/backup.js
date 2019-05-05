@@ -4,6 +4,20 @@ var backup = new runAndLog({
 	exec:path.join(binDir,'mbs_scan.exe'),
 	args:[],
 	onBeforeStart: function(){
+		if(!config.data.lastSettingsSave){
+			showNotify({title:'The copy will be skipped',message:'First configure the backup settings'});
+			return false;
+		}
+		
+		var enableProjects = 0;
+		(config.data.projects || []).forEach(function(project){
+			if(project.enabled) enableProjects++;
+		});
+		if(!enableProjects){
+			showNotify({title:'The copy will be skipped',message:'No active projects'});
+			return false;
+		}		
+		
 		var env = $.extend({},process.env);		
 		env.userBackupDir = this.getUserBackupDir();
 		env.logFileDir = this.getLogFileDir();
@@ -40,7 +54,6 @@ backup.getUserBackupDir = function(){
 }
 backup.events.on('start',function(){
 	console.log('start');
-	$('.monobox').triggerHandler('hide');
 	tray.changeIcon('backup');	
 });
 

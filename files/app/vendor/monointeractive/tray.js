@@ -2,7 +2,8 @@ var tray = new (function(){
 	var scope = this;
 	scope.iconSequence = [];
 	scope.init = function(){
-		if(nodeEnv) scope.tray = new nw.Tray({title:win.title});
+		if(!nodeEnv) return;
+		scope.tray = new nw.Tray({title:win.title,tooltip:win.title});
 		scope.tray.on('click',function(){
 			if(win.minimized){
 				win.restore();

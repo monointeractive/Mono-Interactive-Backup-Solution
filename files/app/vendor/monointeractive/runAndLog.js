@@ -44,7 +44,7 @@ var runAndLog = function(initConfig){
 							}
 						}
 					]
-				});
+				}).attr('data-window-id',scope.parent.config.id);
 				$('[data-id=close]',scope.wnd).hide();
 				var logEvent = function(log){
 					$('<div class="entry">').each(function(idx,entry){
@@ -123,9 +123,9 @@ var runAndLog = function(initConfig){
 		}
 		if(typeof scope.config.onBeforeStart == 'function'){
 			if(scope.config.onBeforeStart.call(scope) === false) return;
-		}
+		}		
+		$('.monobox[data-window-id="'+scope.config.id+'"]').trigger('hide');
 		scope.events.emit('start');
-		
 		scope.processWindow.show();
 		scope.log.append({message: [moment().format("YYYY-MM-DD HH:mm:ss"),'Start'].join(' | ')});
 		console.log('spawn',scope.config.id,{exec:scope.config.exec, args:scope.config.args, params:scope.config.params});
@@ -151,6 +151,7 @@ var runAndLog = function(initConfig){
 			if(!data.info) data.info = 'Normal'; else
 			if(data.isError) data.info = 'Error '+data.info; else
 			if(data.info == 'userexit') data.info = 'Abort by user';
+			if(data.info == 'backToinactivity') data.info = 'Abort by user activity';
 			if(data.messsage) data.info = data.messsage;
 			scope.log.append({error: data.isError ,message: [moment().format("YYYY-MM-DD HH:mm:ss"),'The process was closed',data.info].join(' | ')});
 			scope.events.emit('reject',{reject:data,config:config});

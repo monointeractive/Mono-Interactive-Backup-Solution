@@ -7,7 +7,7 @@ var config = new (function(){
 			scope.data = {"deleteAfterDays":60,"projects":[{"enabled":false,"name":"Neta","path":"E:/dokumenty/neta","accept":"*.docx"},{"enabled":false,"name":"Neta2","path":"E:/downloads","accept":"*.*","maxFileSizeMb":900},{"enabled":true,"name":"Etc","path":"C:/Windows/System32/drivers/etc","accept":"*","maxFileSizeMb":900},{"enabled":false,"name":"Narzedzia","path":"E:/narzedzia","accept":"*.js;*.json","exclude":"*/node_modules/*;*/locales/*;*/node/*;*.h","maxFileSizeMb":100}],"lastRun":"2019-04-17 22:12:03","firstRun":"2019-04-17 09:00:49","lastClose":"2019-04-17 22:11:59"};			
 		}	
 		scope.data = scope.data || {
-			inactivityDelay:20,
+			inactivityDelay:(60 * 20),
 			deleteAfterDays:90,
 			rootBackupDir:path.join(userDir,'backups'),
 			maxBackupExecutionTime:180,

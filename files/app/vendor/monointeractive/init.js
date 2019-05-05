@@ -1,12 +1,14 @@
 var nodeEnv = typeof require == 'function' && typeof require('nw.gui') !='undefined';
 if(nodeEnv){	
 	var fs = require('fs');
+	var path = require('path');
+	process.pids = [];
 	process.execPath = typeof process.env.execPath == 'string' && process.env.execPath.length && fs.existsSync(process.env.execPath) ? process.env.execPath : process.execPath;
 	process.execPath = typeof process.env.launcherPath == 'string' && process.env.launcherPath.length && fs.existsSync(process.env.launcherPath) ? process.env.launcherPath : process.execPath;
 	process.argv[0] = process.execPath;
+
 	console.log('process',process);
 	var util = require('util');
-	var path = require('path');
 	var gui = require('nw.gui');
 	var win = gui.Window.get();
 	var guiApp = gui.App;
@@ -14,6 +16,17 @@ if(nodeEnv){
 	var devToolWindowRef = false;
 	
 	win.orgShow = win.show;
+	win.setTitle = function(){
+		if(typeof win.title == 'string' && win.title.length && !win.orgTitle) win.orgTitle = win.title;
+		if(!arguments.length) win.title = win.orgTitle;
+		arguments = Array.prototype.slice.call(arguments);
+		if(typeof win.orgTitle =='string' && win.orgTitle.length) arguments.unshift(win.orgTitle);
+		win.title = arguments.join(' | ');
+		if(typeof tray == 'object' && typeof tray.tray =='object') {
+			tray.tray.title = tray.tray.tooltip = win.title;
+		}
+	}
+	
 	win.show = function(){
 		if(main && main.splashWnd) main.splashWnd.close(true);
 		this.orgShow();
@@ -55,12 +68,12 @@ if(nodeEnv){
 	var exec = child_process.exec;
 	var execSync = child_process.execSync;
 	var currentDir = process.cwd();
-	var clipboard = gui.Clipboard.get(); 
 	var __dirname = path.resolve();	
 	var execDir = path.dirname(process.execPath);	
 	var cwd = process.cwd();
 	var binDir = path.join(execDir,'bin');
 	var EventEmitter = require('events');
+	var processManager = require(path.join(execDir,'app/modules/processManager.js'));
 	var userDir = guiApp.dataPath;
 	if(path.basename(userDir).toLowerCase()=='default') userDir = path.dirname(userDir);
 	if(path.basename(userDir).toLowerCase()=='user data') userDir = path.dirname(userDir);

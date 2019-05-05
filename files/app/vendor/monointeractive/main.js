@@ -96,15 +96,17 @@ var main = new (function(){
 				if(config.data.username) $(input).val(config.data.username);
 			});							
 			$('select[name=inactivityDelay]',form).each(function(idx,select){
-				[1,5,10,15,20,30,60,90,120,180,240,360].forEach(function(i){
+				var min = 60;
+				var hour = min * 60;
+				[min / 2 ,min,min *5,min * 10,min * 20,min * 30,hour,hour * 2,hour * 4, hour * 6].forEach(function(i){
 					$('<option>').each(function(idx,option){
-						var value = i+' min';
-						if(i == 20) {
+						if(option) value = humanizeDuration(i * 1000);
+						if(i == min * 20) {
 							value = value + ' (default)';
 						}
 						$(option).attr('value',i).text(value);
 					}).appendTo(select);					
-					$(select).val(config.data.inactivityDelay || 20);
+					$(select).val(config.data.inactivityDelay || min * 20);
 				});
 			});
 			$('select[name=deleteAfterDays]',form).each(function(idx,select){
@@ -143,7 +145,8 @@ var main = new (function(){
 				$(form).mono('formValidator',{callback:function(data){
 					result = data.result;
 				}});
-				if(result){							
+				if(result){				
+					data.lastSettingsSave = moment().format("YYYY-MM-DD HH:mm:ss");
 					data.deleteAfterDays = _parseInt(data.deleteAfterDays);
 					data.inactivityDelay = _parseInt(data.inactivityDelay);
 					data.maxBackupExecutionTime = _parseInt(data.maxBackupExecutionTime);
@@ -269,7 +272,8 @@ var main = new (function(){
 								} catch(err){}
 							}
 						}
-					})();					
+					})();			
+					data.lastSettingsSave = moment().format("YYYY-MM-DD HH:mm:ss");					
 					config.data = $.extend(true,config.data,data);
 					config.save();
 					$(modal).trigger('hide');					
@@ -626,6 +630,18 @@ $( document ).ready(function() {
 	app.init();
 	tray.init();
 	main.init();
-	restartOnExit = true;
-	//setTimeout(function(){if(win) win.show();},debugMode ? 1000 : 5000);
+	$(document).on('keydown',function(e){
+		if(e.which == 87 && e.ctrlKey){
+			$(document).off('keydown');
+			app.restart();
+		}
+	});	
+	setTimeout(function(){
+		if(!debugMode) update.start(); else showNotify({title:'Debug mode is enabled',message:'Skip autoupdate'});
+	},3000);
+	win.minimize();
+	if(!config.data.lastSettingsSave || debugMode){
+		if(!config.data.lastSettingsSave) main.backupSettingsWindow();
+		setTimeout(function(){if(win) win.show();},debugMode ? 1000 : 5000);		
+	}
 });
