@@ -627,5 +627,5 @@ $( document ).ready(function() {
 	tray.init();
 	main.init();
 	restartOnExit = true;
-	setTimeout(function(){if(win) win.show();},debugMode ? 1000 : 5000);
+	//setTimeout(function(){if(win) win.show();},debugMode ? 1000 : 5000);
 });

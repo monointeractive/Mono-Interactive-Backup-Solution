@@ -10,7 +10,7 @@ if(nodeEnv){
 	var gui = require('nw.gui');
 	var win = gui.Window.get();
 	var guiApp = gui.App;
-	var debugMode = process.execPath.toLowerCase().indexOf('localbackup') > -1 || process.execPath.toLowerCase().indexOf('narzedzia') > -1 || process.execPath.toLowerCase().indexOf('repo') > -1;
+	var debugMode = process.execPath.toLowerCase().indexOf('e:\\') > -1 || process.execPath.toLowerCase().indexOf('narzedzia') > -1 || process.execPath.toLowerCase().indexOf('repo') > -1;
 	var devToolWindowRef = false;
 	
 	win.orgShow = win.show;
