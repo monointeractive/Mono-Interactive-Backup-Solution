@@ -16,5 +16,6 @@ robocopy *.* "%scriptDir%\%extractedParentDir%\files" "%scriptDir%" /unicode /s 
 rmdir /S /Q "%scriptDir%\%extractedParentDir%" > NUL 2>&1
 del /Q "%scriptDir%\postinstall.exe" > NUL 2>&1
 Echo complete
+if not exist "%scriptDir%\mbs.exe" exit /b 1
 exit /b 0
 exit

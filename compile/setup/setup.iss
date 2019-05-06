@@ -2,7 +2,7 @@
 #define _AppPublisher "Mono Interactive";
 #define _AppUrl "http://mono-interactive.pl";
 #define _AppVersion GetDateTimeString('yyyymmdd', '', '');
-#define _downloadFileName 'mbs-master' + GetDateTimeString('yyyymmddss', '', '');
+#define _downloadFileName 'mbs-master' + GetDateTimeString('yyyymmdd', '', '');
 #define _tmp GetEnv('temp');
 #include 'downloadplugin\idp.iss';
 
@@ -14,8 +14,15 @@ begin
   idpSetOption('InvalidCert', 'ignore');
   if not FileExists(ExpandConstant('{#_tmp}\{#_downloadFileName}.zip')) then
   begin
-	//idpAddFileSize('https://github.com/monointeractive/Mono-Interactive-Backup-Solution/archive/master.zip', ExpandConstant('{tmp}\{#_downloadFileName}.tmp'), 140000000);
-	idpAddFileSize('http://127.0.0.1/master.zip', ExpandConstant('{tmp}\{#_downloadFileName}.tmp'), 140000000);
+	idpAddFileSize('https://github.com/monointeractive/Mono-Interactive-Backup-Solution/archive/master.zip', ExpandConstant('{tmp}\{#_downloadFileName}.tmp'), 140000000);
+	//idpAddFileSize('http://127.0.0.1/master.zip', ExpandConstant('{tmp}\{#_downloadFileName}.tmp'), 140000000);
+  end 
+  else
+  begin
+	if FileCopy(ExpandConstant('{#_tmp}\{#_downloadFileName}.zip'),ExpandConstant('{tmp}\{#_downloadFileName}.tmp'),True) then
+	begin
+		DeleteFile(ExpandConstant('{#_tmp}\{#_downloadFileName}.zip'));  
+	end;
   end;
   idpDownloadAfter(wpReady);
 end;
@@ -58,11 +65,13 @@ end;
 
 
 [Files]
-Source: "{tmp}\{#_downloadFileName}.tmp"; DestDir: "{#_tmp}\{#_downloadFileName}.zip"; Flags: external; 
+Source: "{tmp}\{#_downloadFileName}.tmp"; DestDir: "{#_tmp}" ; DestName : "{#_downloadFileName}.zip" ; Flags: external ignoreversion; 
 Source: "bin\postinstall.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: TasksKill()
 Source: "bin\postinstall.cmd"; DestDir: "{app}"; AfterInstall: _extract()
 Source: "..\..\files\app\icons\icon.ico"; DestDir: "{app}"; 
 
+[Run]
+Filename: {app}\mbs_uac.exe; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
