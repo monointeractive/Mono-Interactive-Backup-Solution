@@ -17,5 +17,9 @@ rmdir /S /Q "%scriptDir%\%extractedParentDir%" > NUL 2>&1
 del /Q "%scriptDir%\postinstall.exe" > NUL 2>&1
 Echo complete
 if not exist "%scriptDir%\mbs.exe" exit /b 1
+copy "%scriptDir%\mbs.exe" /B "%scriptDir%\mbs_updater.exe" /Y > NUL 2>&1
+copy "%scriptDir%\mbs.exe" /B "%scriptDir%\bin\mbs_scan.exe" /Y > NUL 2>&1
+copy "%scriptDir%\mbs.exe" /B "%scriptDir%\bin\mbs_sync.exe" /Y > NUL 2>&1
+
 exit /b 0
 exit
