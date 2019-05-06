@@ -2,7 +2,7 @@
 #define _AppPublisher "Mono Interactive";
 #define _AppUrl "http://mono-interactive.pl";
 #define _AppVersion GetDateTimeString('yyyymmdd', '', '');
-#define _downloadFileName 'mbs-master' + GetDateTimeString('yyyymmdd', '', '');
+#define _downloadFileName 'mbs-master' + GetDateTimeString('yyyymmddhh', '', '');
 #define _tmp GetEnv('temp');
 #include 'downloadplugin\idp.iss';
 
