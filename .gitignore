@@ -11,3 +11,4 @@ files/mbs_updater.dat.tmp
 files/bin/mbs_sync.exe
 files/bin/mbs_scan.exe
 files/mbs_updater.exe
+deploy/setup_mbs_offline.dat
