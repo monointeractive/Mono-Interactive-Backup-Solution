@@ -97,6 +97,9 @@ begin
   result := True;
 end;
 
+[Dirs]
+Name: "{app}";  Permissions: users-full;
+
 [Files]
 Source: "{tmp}\{#_downloadFileName}.tmp"; DestDir: "{#_tmp}" ; DestName : "{#_downloadFileName}.zip" ; Flags: external ignoreversion; 
 Source: "bin\postinstall.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: TasksKill()
@@ -104,8 +107,8 @@ Source: "bin\postinstall.cmd"; DestDir: "{app}"; AfterInstall: _extract()
 Source: "..\..\files\app\icons\icon.ico"; DestDir: "{app}"; 
 
 [Run]
-Filename: {app}\mbs_uac.exe; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait
-Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd""  "; Description: Save the downloaded files to perform offline installation at a later time.; Flags: postinstall nowait unchecked runhidden
+Filename: {app}\mbs_uac.exe; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait runascurrentuser
+Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd""  "; Description: Save the downloaded files to perform offline installation at a later time.; Flags: postinstall nowait unchecked runhidden runascurrentuser
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
@@ -129,7 +132,7 @@ OutputBaseFilename=setup_mbs
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 OutputDir=..\..\deploy\
-PrivilegesRequired=poweruser
+PrivilegesRequired=admin
 AllowUNCPath=False
 ShowLanguageDialog=no
 LanguageDetectionMethod=none
