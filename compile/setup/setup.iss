@@ -114,7 +114,7 @@ Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd"" 
 Type: filesandordirs; Name: "{app}"
 
 [Icons]
-Name: "{group}\{#_AppName}\{#_AppName}"; Filename: "{app}\mbs_normal.exe"; IconFilename: {app}\icon.ico;
+Name: "{group}\{#_AppName}\{#_AppName}"; Filename: "{app}\mbs_uac.exe"; IconFilename: {app}\icon.ico;
 Name: "{group}\{#_AppName}\{cm:UninstallProgram,{#_AppName}}"; Filename: "{uninstallexe}"
 
 [Setup]
