@@ -26,7 +26,7 @@
 }
 
 .disableSelect{
-  &, & *{
+  &, & *{ 
 	  &:not([contenteditable]){
 	  -webkit-touch-callout: none!important; 
 		-webkit-user-select: none!important; 
@@ -37,6 +37,37 @@
 	  }
   }
 }
+
+.checkbox label {
+    display: inline-block;
+    padding-left: 10px;
+    padding-bottom: 5px;
+    position: relative;
+    font-weight: inherit;
+    font-size: inherit;
+	&::after {
+		padding-top: 3px;
+	}	
+	&::before {
+		-o-transition: 0.3s ease-in-out;
+		-webkit-transition: 0.3s ease-in-out;
+		background-color: #3d4853;
+		border-radius: 2px;
+		border: 1px solid #98a6ad;
+		content: "";
+		display: inline-block;
+		height: 17px;
+		left: 0;
+		margin-left: -17px;
+		top: 2px;
+		padding-right: 10px;
+		position: absolute;
+		transition: 0.3s ease-in-out;
+		width: 17px;
+		outline: none !important;
+	}	
+}
+
 .form-group{
 	label{
 		white-space:nowrap;

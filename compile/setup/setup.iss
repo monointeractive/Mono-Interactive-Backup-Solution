@@ -25,7 +25,7 @@ begin
 	if FileExists(  WizardDirValue() + '\mbs.exe') then
   begin  
 	SuppressibleMsgBox('It has been detected that the application is already installed in the folder: '+ WizardDirValue() +'. Uninstall the application before reinstalling.', mbError, MB_OK,MB_OK);
-  	Abort();
+  	//Abort();
   end;
 end;
 
@@ -66,7 +66,7 @@ begin
     Exec(ExpandConstant('taskkill.exe'), '/f /t /im ' + '"mbs.exe"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 
-procedure _extract();
+procedure postInstall();
 var
   ResultCode: Integer;
   Status: Boolean;
@@ -98,23 +98,23 @@ begin
 end;
 
 [Dirs]
-Name: "{app}";  Permissions: users-full;
+Name: "{app}";  Permissions: users-full
 
 [Files]
 Source: "{tmp}\{#_downloadFileName}.tmp"; DestDir: "{#_tmp}" ; DestName : "{#_downloadFileName}.zip" ; Flags: external ignoreversion; 
 Source: "bin\postinstall.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: TasksKill()
-Source: "bin\postinstall.cmd"; DestDir: "{app}"; AfterInstall: _extract()
-Source: "..\..\files\app\icons\icon.ico"; DestDir: "{app}"; 
+Source: "bin\postinstall.cmd"; DestDir: "{app}"; AfterInstall: postInstall()
+Source: "..\..\files\app\icons\icon.ico"; DestDir: "{app}"
 
 [Run]
-Filename: {app}\mbs_uac.exe; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait runascurrentuser
+Filename: {app}\mbs_uac.exe; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait
 Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd""  "; Description: Save the downloaded files to perform offline installation at a later time.; Flags: postinstall nowait unchecked runhidden runascurrentuser
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
 
 [Icons]
-Name: "{group}\{#_AppName}\{#_AppName}"; Filename: "{app}\mbs_uac.exe"; IconFilename: {app}\icon.ico;
+Name: "{group}\{#_AppName}\{#_AppName}"; Filename: "{app}\mbs_normal.exe"; IconFilename: {app}\icon.ico;
 Name: "{group}\{#_AppName}\{cm:UninstallProgram,{#_AppName}}"; Filename: "{uninstallexe}"
 
 [Setup]

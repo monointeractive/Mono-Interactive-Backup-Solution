@@ -5,7 +5,7 @@ var path = require('path');
 module.exports = function(){
 	var scope = this;	
 	scope.events = new EventEmitter();
-		
+	console.log('Init process manager');	
 	scope.isRunning = function(){
 		return ((scope.process && typeof scope.process.kill == 'function' && scope.process.pid) && scope.process.running);
 	}	
@@ -28,12 +28,27 @@ module.exports = function(){
 		config = typeof _config == 'object' ? extend(true,{},_config) : {};
 		config.env = extend(true,{}, JSON.parse(JSON.stringify(process.env || {})),(config.env || {}));
 		Object.defineProperty(config.env, 'PKG_EXECPATH', { set: function(val) { } });
-		console.debug('Exec',{executable:executable,args:args,config:config});
 		var ext = path.extname(executable).toLowerCase().split('.').join('');
-		if(ext == 'com' || ext == 'bat' || ext == 'cmd' || config.shell) config.windowsHide = true;
+		if(typeof config.windowsHide == 'undefined' && (ext == 'com' || ext == 'bat' || ext == 'cmd' || config.shell)) config.windowsHide = true;
 		scope.process = require('child_process').spawn(executable, args, config);
+		if(typeof scope.process !='object' || typeof scope.process.on !='function'){
+			scope.process =  new EventEmitter();
+			scope.process.on = function(eventType){
+				return {eventType:eventType, error:'Process not started'};
+			}
+			return scope.process;
+		}
 		if(scope.process.pid && process.pids.indexOf(scope.process.pid) == -1) process.pids.push(scope.process.pid);
 		var child = scope.process;
+		child.scope = scope;
+		setTimeout(function(){
+			child.emit('spawn',{
+				executable:executable,
+				args:args,
+				config:config,
+				spawned:scope.process
+			});
+		},1);
 		child.running = true;
 		if(child.stdout) {
 			child.stdout.setEncoding('utf8');

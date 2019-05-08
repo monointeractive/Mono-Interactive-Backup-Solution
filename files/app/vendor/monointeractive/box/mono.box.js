@@ -76,14 +76,16 @@
 						if(typeof attr =='string' && ['string','number','boolean'].indexOf(typeof(btn[attr])) >-1) $(button).attr('data-'+attr, btn[attr]);
 					}
 					btn.className = btn.className || 'btn btn-primary';
+					$(button).attr('type','button');
 					$(button).addClass(btn.className);
 					if(btn.className.indexOf('btn-') > -1) $(button).addClass('btn');
 					$(button).append(btn.label);
-					$(button).on('click',function(e){
+					$(button).on('click',function(e){						
 						var result = true;
 						if(typeof btn.callback == 'function') result = btn.callback.call(button,monobox);
 						if(String(result) !='false') $(monobox).triggerHandler('hide');
 						e.preventDefault();
+						e.stopPropagation();
 					});
 				}).appendTo($('.monobox-buttons',monobox));
 			}
@@ -98,6 +100,7 @@
 				$(monobox).triggerHandler('shown');
 			});
 			$(monobox).one('hide',function(e){
+				console.error(e);
 				e.stopPropagation();
 				$('.monobox-content',monobox).removeClass(config.showAnimationClass).addClass(config.hideAnimationClass);
 				$('.monobox-content',monobox).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {					

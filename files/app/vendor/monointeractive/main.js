@@ -6,7 +6,7 @@ var main = new (function(){
 		scope.projects = config.data.projects;
 		scope.table.parent = scope;
 		scope.table.init();
-		//scope.backupSettingsWindow();
+		scope.backupSettingsWindow();
 		//$('.btn-edit').last().click();
 	}
 	scope.showSplash = function(){
@@ -68,7 +68,18 @@ var main = new (function(){
 						</div>						
 					</div>
 				</div>								
-			</div>							
+			</div>			
+			<div class="row">
+				<div class="col">
+					<div class="form-group">
+						<label>Launching the application during "${process.env.username}" logon (as a service)</label>
+						<div>
+							<button type="button" id="installService" class="btn btn-primary"><span class="fa fa-shield"></span>&nbsp;&nbsp;Create service</button>&nbsp;&nbsp;
+							<button type="button" id="removeService" class="btn btn-primary"><span class="fa fa-shield"></span>&nbsp;&nbsp;Remove service</button>
+						</div>
+					</div>
+				</div>								
+			</div>									
 		</form>`).each(function(idx,form){
 				config.data.server = config.data.server || {};
 			var modal = $.mono.box({
@@ -82,7 +93,7 @@ var main = new (function(){
 						label: 'Save',
 						className: 'btn primary',
 						id:'submit',
-						callback: function(modal){							
+						callback: function(modal){	
 							$(form).submit();
 							return false;
 						}
@@ -137,8 +148,50 @@ var main = new (function(){
 			
 			$('input[name="rootBackupDir"]',form).each(function(idx,input){
 				if(config.data.rootBackupDir) $(input).val(config.data.rootBackupDir);
-			});							
-		
+			});					
+
+			var serviceSetup = function(toRemove){
+				var command = '/C ""'+path.join(binDir,'mbs_admin.exe')+'" schtasks.exe ';
+				if(!toRemove){					
+					var taskXmlPath = path.join(process.env.temp,'mbsTask-'+clearLink(process.env.username)+'.xml');
+					var taskXmlContent = fs.readFileSync(path.join(execDir,'app','assets','xml','startupTaskTemplate.xml'), 'ucs2')
+						.split('{username}').join(process.env.username)
+						.split('{computername}').join(process.env.computername)
+						.split('{command}').join(path.join(execDir,'mbs_uac.exe'));
+					try{						
+						fs.writeFileSync(
+							taskXmlPath, 
+							taskXmlContent
+						,'ucs2');
+					} catch(err){
+						showNotify({title:'Action error',message:err.toString()});
+					}				
+					command +='/Create /F /tn "MbsStart-'+clearLink(process.env.username)+'" /XML "'+taskXmlPath+'""';					
+				} else {
+					command +='/Delete /F /tn "MbsStart-'+clearLink(process.env.username)+'""';
+				}
+				
+				console.log(command);
+				var runAsAdmin = (new processManager()).spawn('cmd.exe', [command], {windowsHide:true,shell:true});
+				runAsAdmin.once('stderr',function(data){
+					showNotify({title:'Action error',message:data});
+				});
+				runAsAdmin.on('stdout',function(data){
+					showNotify({title:'Action output',message:data});
+				});					
+				runAsAdmin.on('error',function(data){
+					showNotify({title:'Action error',message:data.toString()});
+				});				
+				
+			}
+			$('button[id="installService"]',form).on('click',function(e){	
+				$(this).attr('disabled','disabled').prop('disabled',true).addClass('disabled');
+				serviceSetup();
+			});					
+			$('button[id="removeService"]',form).on('click',function(e){				
+				$(this).attr('disabled','disabled').prop('disabled',true).addClass('disabled');
+				serviceSetup(true);
+			});			
 			$(form).on('submit',function(e){
 				var data = $(form).serializeAssoc();
 				var result = false;

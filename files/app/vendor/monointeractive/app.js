@@ -55,7 +55,7 @@ var app = new (function(){
 		try{ process.exit();} catch(err){}
 	}
 	scope.restart = function(){		
-		var restartProcess = spawn(process.execPath, { env:$.extend(true,process.env,{wait:3}),detached: true, windowsHide:false,stdio: ['ignore'] }).unref();
+		var restartProcess = spawn(process.execPath, { env:$.extend(true,process.env,{wait:3}),detached: true, windowsHide:false,stdio: ['ignore'] }).unref();		
 		try{ if(typeof tray =='object' && tray.remove) tray.remove();} catch(err){}
 		try{process.kill(process.pid);} catch(err){};
 		try{scope.exit();} catch(err){};
@@ -68,13 +68,15 @@ var app = new (function(){
 		}
 	}
 	scope.startIdleTimer = function(){
-			scope.idleTimeProcess = new processManager().spawn(path.join(binDir,'idleTime','idleTime.exe'), [], {stdio: ['pipe', 'pipe', 'pipe', 'ipc']});
+			scope.idleTimeProcess = (new processManager()).spawn(path.join(binDir,'idleTime','idleTime.exe'), [], {stdio: ['pipe', 'pipe', 'pipe', 'ipc']});
 			if(!scope.idleTimeProcess.pid) {
 				scope.idleTimeProcess = null;
 				return;
 			}
 			var child = scope.idleTimeProcess;
-			child.running = true;
+			child.on('spawn',function(data){
+				console.log(data);
+			});					
 			
 			child.on('stdout',function(data){console.log('idleTimeProcess','stdout',data);});
 			child.on('stderr',function(data){console.log('idleTimeProcess','stderr',data);});
