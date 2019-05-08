@@ -25,7 +25,7 @@ begin
 	if FileExists(  WizardDirValue() + '\mbs.exe') then
   begin  
 	SuppressibleMsgBox('It has been detected that the application is already installed in the folder: '+ WizardDirValue() +'. Uninstall the application before reinstalling.', mbError, MB_OK,MB_OK);
-  	//Abort();
+  	Abort();
   end;
 end;
 
