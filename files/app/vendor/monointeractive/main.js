@@ -603,7 +603,7 @@ var main = new (function(){
 				<thead>
 					<tr>
 						<th colspan="2"><span>Name</span></th>
-						<th><span>Path</span></th>
+						<th style="width:30%"><span>Path</span></th>
 						<th><span>Accept</span></th>
 						<th><span>Exclude</span></th>
 						<th style="width:1px;" class="text-center"></th>

@@ -230,12 +230,14 @@ html {
                 html body > .wrapper > .container-fluid > .row > .col-12 > .pages > div.card-box#graph {
                   color: white;
                   height: 100%; }
-    html body #topnav .navigation-menu > li > a {
-      font-size: 14px; }
-      html body #topnav .navigation-menu > li > a i {
-        font-size: inherit; }
-    html body #topnav .navigation-menu > li > .submenu {
-      min-width: auto; }
+    html body #topnav {
+      white-space: nowrap; }
+      html body #topnav .navigation-menu > li > a {
+        font-size: 14px; }
+        html body #topnav .navigation-menu > li > a i {
+          font-size: inherit; }
+      html body #topnav .navigation-menu > li > .submenu {
+        min-width: auto; }
     html body button {
       cursor: pointer; }
     html body textarea {
