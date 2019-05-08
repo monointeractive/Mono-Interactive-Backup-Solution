@@ -78,13 +78,44 @@
 		color: #3596ff;
 	}
 } 
-
+.monobox[data-status=reject]{
+	div.logs{
+		> .entry{
+			&:last-child{
+				&:before{
+					content: "\f08b"!important;
+					animation: none!important;
+				}
+			}
+		}
+	}
+}
 div.logs{
+	&, *:after,& *:before{
+		transition: font-size !important;
+	}
 	max-height:200px;
 	overflow:hidden;
 	overflow-y:auto;
 	> .entry{
-		&:before{
+		&:last-child{
+			font-size:110%;
+			margin-top:10px;
+			padding:5px;
+			background-color:black;
+			&:before{
+				margin-left:5px;
+				content: "\f021";		
+				margin-right:10px;
+				display: inline-block;
+				font-family: FontAwesome;
+				font-size: inherit;
+				text-rendering: auto;
+				-webkit-font-smoothing: antialiased;				
+				animation: fa-spin .5s infinite linear;
+			}
+		}
+		&:after{
 			content: attr(title);
 		}	
 		white-space: nowrap;
@@ -92,6 +123,7 @@ div.logs{
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		padding-left:3px;
 		margin-top: 0;
 		margin-bottom: 1px;
 		font-size: 90%;
@@ -317,7 +349,7 @@ html{
 	body{		
 		&[data-monobox-open="true"]{	
 			& > div,header{
-				transition: all 0.3s;
+				transition: filter 0.3s;
 				&:not([data-ontop="true"]):not([data-notify]){
 					filter: blur(3px);
 				}
@@ -417,7 +449,7 @@ html{
 
 .monobox {
 	&, & *,& *:before,& *:after {
-		transition: all 0.3s;
+		transition: filter 0.3s;
 	}
 	
 	&:not([data-ontop=true]){	   
@@ -435,7 +467,7 @@ html{
 						color:#98a6ad;
 						border-radius: 0px;
 						border-bottom-color:#b7b7b7;
-						background-color:#1f272f;
+						background-color:#101419;
 						> .monobox-header{
 							> .monobox-title, .monobox-close{
 								padding-bottom:0px;

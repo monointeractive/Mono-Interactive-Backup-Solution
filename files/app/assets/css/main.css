@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .btn {
   padding: .15rem .4rem; }
 
@@ -55,16 +56,23 @@
 .input-group-append .btn {
   color: #3596ff; }
 
+.monobox[data-status=reject] div.logs > .entry:last-child:before {
+  content: "" !important;
+  animation: none !important; }
+
 div.logs {
   max-height: 200px;
   overflow: hidden;
   overflow-y: auto; }
+  div.logs, div.logs *:after, div.logs *:before {
+    transition: font-size !important; }
   div.logs > .entry {
     white-space: nowrap;
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 3px;
     margin-top: 0;
     margin-bottom: 1px;
     font-size: 90%;
@@ -72,7 +80,22 @@ div.logs {
     max-width: 99%;
     font-family: monospace;
     background-color: #ffffff17; }
-    div.logs > .entry:before {
+    div.logs > .entry:last-child {
+      font-size: 110%;
+      margin-top: 10px;
+      padding: 5px;
+      background-color: black; }
+      div.logs > .entry:last-child:before {
+        margin-left: 5px;
+        content: "\f021";
+        margin-right: 10px;
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        animation: fa-spin .5s infinite linear; }
+    div.logs > .entry:after {
       content: attr(title); }
     div.logs > .entry.error {
       color: #da4040; }
@@ -209,7 +232,7 @@ html {
     margin: 0px !important;
     height: 100vh; }
     html body[data-monobox-open="true"] > div, html body[data-monobox-open="true"] header {
-      transition: all 0.3s; }
+      transition: filter 0.3s; }
       html body[data-monobox-open="true"] > div:not([data-ontop="true"]):not([data-notify]), html body[data-monobox-open="true"] header:not([data-ontop="true"]):not([data-notify]) {
         filter: blur(3px); }
     html body > .wrapper {
@@ -270,7 +293,7 @@ html {
     margin-right: 20px; }
 
 .monobox, .monobox *, .monobox *:before, .monobox *:after {
-  transition: all 0.3s; }
+  transition: filter 0.3s; }
 .monobox:not([data-ontop=true]) .monobox-dialog {
   opacity: 0.9; }
 .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog {
@@ -279,7 +302,7 @@ html {
     color: #98a6ad;
     border-radius: 0px;
     border-bottom-color: #b7b7b7;
-    background-color: #1f272f; }
+    background-color: #101419; }
     .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header > .monobox-title, .monobox > .monobox-container > .monobox-hbox > .monobox-vbox > .monobox-dialog > .monobox-content > .monobox-header .monobox-close {
       padding-bottom: 0px;
       padding-top: 10px;

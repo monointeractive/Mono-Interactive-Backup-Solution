@@ -5,11 +5,30 @@ var app = new (function(){
 		scope.startIdleTimer();
 		scope.events = new EventEmitter();
 		scope.title = win.title;
+		scope.exitAfterTimeout = 3600; // 1 hour
+		scope.initAutoExit = function(){
+			if(!scope.startTime){
+				scope.startTime =  new Date().getTime();
+				scope.autoExitInterval =  setInterval(function(){
+					var sec = ((new Date().getTime()) - scope.startTime) / 1000;
+					if(sec > scope.exitAfterTimeout){
+						clearInterval(scope.autoExitInterval);
+						scope.backup.stop('userexit');		
+						scope.sync.stop('userexit');		
+						scope.update.stop('userexit');					
+						setTimeout(function(){
+							scope.restart();							
+						},5000);
+					}
+				},1000);
+			}
+		}
 		var backToinactivity = function(){
 			console.log('backToinactivity');
 			scope.lastUserInactivityTime = 0;
 			backup.stop('backToinactivity');
 		}
+
 		scope.events.on('inactivityTimeout',function(){
 			console.log('inactivityTimeout');
 			scope.events.off('backToinactivity',backToinactivity);
@@ -17,9 +36,9 @@ var app = new (function(){
 			backup.start();
 		});
 		scope.events.on('user.idle',function(idleTime){
-			win.setTitle();
+			win.setTitle();			
 			if(idleTime){
-				if(config.data.inactivityDelay){
+				if(config.data.inactivityDelay && !backup.isRunning()){
 					var diffSec = config.data.inactivityDelay - idleTime;
 					var info = 'Time to start the backup: '+moment.utc(moment.duration(diffSec, 'seconds').as('milliseconds')).format('HH:mm:ss')	
 					if(diffSec <=1 && (idleTime < scope.lastUserInactivityTime || !scope.lastUserInactivityTime)){
@@ -74,9 +93,6 @@ var app = new (function(){
 				return;
 			}
 			var child = scope.idleTimeProcess;
-			child.on('spawn',function(data){
-				console.log(data);
-			});					
 			
 			child.on('stdout',function(data){console.log('idleTimeProcess','stdout',data);});
 			child.on('stderr',function(data){console.log('idleTimeProcess','stderr',data);});

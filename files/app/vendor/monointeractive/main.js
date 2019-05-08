@@ -1,4 +1,5 @@
 var main = new (function(){
+	setTimeout(function(){},1);
 	var scope = this;
 	scope.init = function(){
 		scope.showSplash();
@@ -692,11 +693,15 @@ $( document ).ready(function() {
 	});	
 	win.minimize();
 	var showDelay = debugMode ? 1000 : 5000;
-	setTimeout(function(){ if(!debugMode) update.start(); else showNotify({title:'Debug mode is enabled',message:'Skip autoupdate'});},showDelay+1000);	
+	setTimeout(function(){},1);
+	setTimeout(function(){
+		update.start(); 
+	},showDelay + 2000);
 	if(!config.data.lastSettingsSave || debugMode){
 		setTimeout(function(){
 			win.show();
 			if(!config.data.lastSettingsSave) main.backupSettingsWindow();
 		},showDelay);		
 	}
+	app.initAutoExit();
 });

@@ -67,6 +67,7 @@ var runAndLog = function(initConfig){
 				}
 				parent.events.on('log',logEvent);
 				parent.events.once('reject',function(data){
+					$(scope.wnd).attr('data-status','reject');
 					$('[data-id=stop]',scope.wnd).addClass('disabled').prop('disabled',true);
 				});
 				$(scope.wnd).one('hide.'+scope.parent.config.id+' unload.'+scope.parent.config.id,function(e){
@@ -114,24 +115,32 @@ var runAndLog = function(initConfig){
 	scope.sendCtrlC = function(){
 		scope.write("\x03");
 	}
-	
 	scope.start = function(config){
 		config = typeof config == 'object' ? config : {};
 		if(scope.isRunning()) {
 			showNotify({title:scope.config.title,message:'Process is already running!'});
 			return;
-		}
+		}		
+
 		if(typeof scope.config.onBeforeStart == 'function'){
 			if(scope.config.onBeforeStart.call(scope) === false) return;
 		}		
-		$('.monobox[data-window-id="'+scope.config.id+'"]').trigger('hide');
+		$('.monobox[data-window-id="'+scope.config.id+'"]').trigger('hide');		
 		scope.events.emit('start');
-		scope.processWindow.show();
+		scope.processWindow.show().one('shown',function(){
+			console.log('shown');
+			scope.spawnAfterShow(config);
+		});
+	};
+	scope.spawnAfterShow = function(config){
 		scope.log.append({message: [moment().format("YYYY-MM-DD HH:mm:ss"),'Start'].join(' | ')});
-		console.log('spawn',scope.config.id,{exec:scope.config.exec, args:scope.config.args, params:scope.config.params});
-		scope.process = (new processManager()).spawn(scope.config.exec, scope.config.args, scope.config.params);
+		scope.process = (new processManager()).spawn(scope.config.exec, scope.config.args, scope.config.params);			
 		var child = scope.process;
-		console.log('child pid',child.pid);
+		console.log('child pid',child ? child.pid : null);
+		if(!child.pid){
+			showNotify({title:scope.config.title,message:'Process creation error'});
+			return;
+		}
 		child.on('stdout',function(message){
 			scope.log.append({message:message});
 		});
