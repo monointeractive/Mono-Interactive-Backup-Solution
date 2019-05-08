@@ -100,7 +100,6 @@
 				$(monobox).triggerHandler('shown');
 			});
 			$(monobox).one('hide',function(e){
-				console.error(e);
 				e.stopPropagation();
 				$('.monobox-content',monobox).removeClass(config.showAnimationClass).addClass(config.hideAnimationClass);
 				$('.monobox-content',monobox).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {					

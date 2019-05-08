@@ -59,9 +59,9 @@ if(nodeEnv){
 		if(debugMode && typeof win == 'object' && win.showDevTools && ((win.isDevToolsOpen && !win.isDevToolsOpen()) || !win.isDevToolsOpen)){
 			win.showDevTools();			
 		}
-		winNotify({body:err,onClose:function(){close();}});
-		setTimeout(function(){close();},30000);
+		setTimeout(function(){process.exit();},60000);
 		process.isExit = true;
+		winNotify({body:err,onClose:function(){process.exit();}});
 	});  
 	var child_process = require('child_process');
 	var spawn = child_process.spawn;

@@ -7,6 +7,7 @@ var main = new (function(){
 		scope.table.parent = scope;
 		scope.table.init();
 		scope.backupSettingsWindow();
+		scope.inited = true; 
 		//$('.btn-edit').last().click();
 	}
 	scope.showSplash = function(){
@@ -689,12 +690,13 @@ $( document ).ready(function() {
 			app.restart();
 		}
 	});	
-	setTimeout(function(){
-		if(!debugMode) update.start(); else showNotify({title:'Debug mode is enabled',message:'Skip autoupdate'});
-	},3000);
 	win.minimize();
+	var showDelay = debugMode ? 1000 : 5000;
+	setTimeout(function(){ if(!debugMode) update.start(); else showNotify({title:'Debug mode is enabled',message:'Skip autoupdate'});},showDelay+1000);	
 	if(!config.data.lastSettingsSave || debugMode){
-		if(!config.data.lastSettingsSave) main.backupSettingsWindow();
-		setTimeout(function(){if(win) win.show();},debugMode ? 1000 : 5000);		
+		setTimeout(function(){
+			win.show();
+			if(!config.data.lastSettingsSave) main.backupSettingsWindow();
+		},showDelay);		
 	}
 });
