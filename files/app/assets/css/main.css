@@ -23,6 +23,18 @@
   -ms-user-select: none !important;
   user-select: none !important; }
 
+#dropZone {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+  text-align: center;
+  font-size: 26px;
+  border: 2px dashed #ffffff38;
+  background-color: #ffffff08;
+  margin: 20px;
+  margin-top: 50px; }
+
 .checkbox label {
   display: inline-block;
   padding-left: 10px;

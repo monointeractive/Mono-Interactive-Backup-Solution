@@ -12,13 +12,8 @@ var app = new (function(){
 				scope.autoExitInterval =  setInterval(function(){
 					var sec = ((new Date().getTime()) - scope.startTime) / 1000;
 					if(sec > scope.exitAfterTimeout){
-						clearInterval(scope.autoExitInterval);
-						scope.backup.stop('userexit');		
-						scope.sync.stop('userexit');		
-						scope.update.stop('userexit');					
-						setTimeout(function(){
-							scope.restart();							
-						},5000);
+						clearInterval(scope.autoExitInterval);						
+						scope.restart();							
 					}
 				},1000);
 			}
@@ -76,7 +71,10 @@ var app = new (function(){
 	scope.restart = function(){		
 		var restartProcess = spawn(process.execPath, { env:$.extend(true,process.env,{wait:3}),detached: true, windowsHide:false,stdio: ['ignore'] }).unref();		
 		try{ if(typeof tray =='object' && tray.remove) tray.remove();} catch(err){}
-		try{process.kill(process.pid);} catch(err){};
+		try{scope.backup.stop('userexit');} catch(err){};
+		try{scope.sync.stop('userexit');} catch(err){};		
+		try{scope.update.stop('userexit');} catch(err){};					
+		setTimeout(function(){try{process.kill(process.pid);} catch(err){};},1000);
 		try{scope.exit();} catch(err){};
 	}	
 	scope.restartIdleTimer = function(){

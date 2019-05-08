@@ -250,13 +250,13 @@ var main = new (function(){
 				<div class="col">
 					<div class="form-group">
 					  <label>Username</label>
-					  <input name="server.user" type="text" placeholder="e.g. anonymous" class="form-control">
+					  <input name="server.user" type="text" data-onvalidate="if(!$.trim(this.value).length) return 'Enter server username'" placeholder="e.g. anonymous" class="form-control">
 					</div>
 				</div>
 				<div class="col">
 					<div class="form-group">
 					  <label>Password</label>
-					  <input name="server.pass" type="password" placeholder="" class="form-control">
+					  <input name="server.pass" type="password" data-onvalidate="if(!$.trim(this.value).length) return 'Enter server password'" placeholder="" class="form-control">
 					</div>
 				</div>													
 			</div>			
@@ -337,18 +337,21 @@ var main = new (function(){
 			});			
 		});		
 	}	
-	scope.projectPropertiesWindow = function(project,isNew){
+	scope.projectPropertiesWindow = function(project,isNew,windowless){
+		var modal;
 		var isExist = project && typeof project == 'object';
-		if(!isExist) {
-			project = {
+		project = project || {};
+		isNew = isNew || !isExist;
+		if(!isExist || isNew) {
+			project = extend(true,{}, {
 				enabled:true, 
 				maxFileSizeMb:100,
 				maxZipFileSizeMb:50,
 				exclude : '*\\tmp\\*;*\\temp\\*'
-			};	
+			},project);	
 		}
-		isNew = isNew || !isExist;
 		project.accept = typeof project.accept == 'string' && project.accept.length ? project.accept : '*.*';
+		var saveAsNew = isNew;
 
 		$(`<form>
 			<div class="row">
@@ -407,23 +410,38 @@ var main = new (function(){
 				</div>						
 			</div>					
 		</form>`).each(function(idx,form){
-			var modal = $.mono.box({
+			modal = $.mono.box({
 				title:'Project properties',
 				message:form,
 				autofocus:false,
 				fitToMaxWidth:true,
 				maxWidth:800,
-				buttons:[
-					{
+				buttons:(function(){
+					var buttons = [];
+					if(!isNew){						
+						buttons.push({
+							label: 'Save as new (clone)',
+							className: 'btn primary',
+							id:'submitNew',
+							callback: function(modal){							
+								saveAsNew = true;
+								$(form).submit();
+								return false;
+							}
+						});
+					}
+					buttons.push({
 						label: 'Save',
 						className: 'btn primary',
 						id:'submit',
 						callback: function(modal){							
+							saveAsNew = isNew;
 							$(form).submit();
 							return false;
 						}
-					}
-				]
+					});
+					return buttons;
+				})()
 			})					
 			$('select[name=maxFileSizeMb]',form).each(function(idx,select){
 				[10,50,100,300,500,1000,99999].forEach(function(i){
@@ -545,15 +563,17 @@ var main = new (function(){
 						data[filterType] = data[filterType].join(';');
 					});
 					if(!data.accept.length) data.accept = '*.*';
-					project = $.extend(true,project,data);
-					if(isNew) scope.projects.push(project);
+					
+					if(saveAsNew) scope.projects.push(extend(true,{},project,data)); else project = extend(true,project,data);
 					config.save();
 					scope.table.reload();
 					$(modal).trigger('hide');					
 				}
 				return false;
-			});			
+			});		
+			if(windowless) $(form).submit();
 		});
+		return modal;
 	}
 	scope.table = new (function(){
 		var scope = this;
@@ -600,6 +620,11 @@ var main = new (function(){
 			scope.reload();
 		}
 		scope.reload = function(){
+			$('#projectList').empty();
+			if(!(scope.parent.projects || []).length) {
+				$('#projectList').append($(`<div id="dropZone">To create a new project, drag the selected directory here<div style="margin-top:20px;"><span style="font-size:70px;" class="fa fa-folder-open-o"></span></div><div style="margin-top:20px;font-size:80%;">or select File &raquo; <a onclick="main.projectPropertiesWindow(null,true);" href="#":>New project</a>.</div></div>`));
+				return;
+			}
 			scope.projectTable = $(`<table class="recordTable table table-bordered table-striped table-hover table-sm">
 				<thead>
 					<tr>
@@ -613,7 +638,7 @@ var main = new (function(){
 				<tbody>
 				</tbody>
 			</table>`);
-			$('#projectList').empty().append(scope.projectTable);			
+			$('#projectList').append(scope.projectTable);			
 			
 			scope.parent.projects.forEach(function(project,idx){
 				$(`<tr data-status="${project.enabled ? "selected" : "false"}">
@@ -643,11 +668,29 @@ var main = new (function(){
 })();
 
 $( document ).ready(function() {
+	window.ondragover = function(e) { e.preventDefault(); return false };
+	window.ondrop = function(e) { e.preventDefault(); return false };
 	$('body').on('dblclick','.recordTable tr',function(e){
 		$('.btn-edit',this).first().click();
 		e.preventDefault(); 
 		e.stopPropagation();
 	});
+
+$('body').on('dragover',function(e){}).on('dragleave',function(e){}).on('drop',function(e){
+		e.preventDefault();
+		if(e.originalEvent && e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files.length){			
+			var files = [].slice.call(e.originalEvent.dataTransfer.files);
+			if(files.length) {
+				for (var i = 0; i < files.length; ++i){
+					var dirPath = files[i].path;
+					var dirName = toTitleCase(path.basename(dirPath)) + ' in ' + toTitleCase(path.basename(path.dirname(dirPath)));
+					if(dirPath.isValidWindowsDirname()) main.projectPropertiesWindow({name:dirName,path:dirPath},true,true);
+				}					
+			}
+		}
+		return false;
+	});
+	
 	$('body').on('click','.btn-browse-dir',function(e){
 		var input = false;
 		if(!input) $(this).parents('.input-group').first().find('input').first().each(function(){input = this;});

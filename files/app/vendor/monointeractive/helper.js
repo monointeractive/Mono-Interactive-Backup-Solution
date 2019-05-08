@@ -312,6 +312,7 @@ String.prototype.isValidWindowsDirname = function(config) {
 	return true;
 }
 
+
 String.prototype.isFirstUpper = function() {
 	var reslut = true;
 	if(this[0] != this[0].toUpperCase()) reslut = false;

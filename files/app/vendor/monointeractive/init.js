@@ -15,6 +15,7 @@ if(nodeEnv){
 	var debugMode = process.execPath.toLowerCase().indexOf('e:\\') > -1 || process.execPath.toLowerCase().indexOf('narzedzia') > -1 || process.execPath.toLowerCase().indexOf('repo') > -1;
 	var devToolWindowRef = false;
 	
+	win.title = win.title + ' | ' + process.env.username;
 	win.orgShow = win.show;
 	win.setTitle = function(){
 		if(typeof win.title == 'string' && win.title.length && !win.orgTitle) win.orgTitle = win.title;
@@ -73,6 +74,7 @@ if(nodeEnv){
 	var cwd = process.cwd();
 	var binDir = path.join(execDir,'bin');
 	var EventEmitter = require('events');
+	var extend = require(path.join(execDir,'app/modules/node_modules/extend'));
 	var processManager = require(path.join(execDir,'app/modules/processManager.js'));
 	var userDir = guiApp.dataPath;
 	if(path.basename(userDir).toLowerCase()=='default') userDir = path.dirname(userDir);

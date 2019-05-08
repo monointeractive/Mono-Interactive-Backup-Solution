@@ -128,7 +128,6 @@ var runAndLog = function(initConfig){
 		$('.monobox[data-window-id="'+scope.config.id+'"]').trigger('hide');		
 		scope.events.emit('start');
 		scope.processWindow.show().one('shown',function(){
-			console.log('shown');
 			scope.spawnAfterShow(config);
 		});
 	};
@@ -149,7 +148,6 @@ var runAndLog = function(initConfig){
 		});		
 		
 		child.once('exited',function(data){
-			console.log('spawn exited');
 			data.code = parseInt(data.code,10) || 0;
 			if(child.rejectCode) data.code = child.rejectCode;
 			scope.stop(child.rejectCode);
@@ -164,7 +162,7 @@ var runAndLog = function(initConfig){
 			if(data.messsage) data.info = data.messsage;
 			scope.log.append({error: data.isError ,message: [moment().format("YYYY-MM-DD HH:mm:ss"),'The process was closed',data.info].join(' | ')});
 			scope.events.emit('reject',{reject:data,config:config});
-			console.log('exited',data,child);
+			console.log('exited',data,child,config);
 		});
 		child.once('reject',function(code){
 			child.emit('exited',{type:'exit',code:code});

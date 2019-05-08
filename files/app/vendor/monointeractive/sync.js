@@ -13,6 +13,7 @@ var sync = new runAndLog({
 			var env = $.extend({},process.env);
 			env.logPath = path.join(logDir,'transfer-'+moment().format("YYYYMMDD")+'.log');
 			env.backupDir = this.config.syncBackupDir;
+			serverConfig.user = $.trim(serverConfig.user);
 			serverConfig.pass = $.trim(serverConfig.pass);
 			serverConfig.port = _parseInt(serverConfig.port);
 			serverConfig.remoteDir = $.trim(serverConfig.remoteDir);
