@@ -107,7 +107,7 @@ Source: "bin\postinstall.cmd"; DestDir: "{app}"; AfterInstall: postInstall()
 Source: "..\..\files\app\icons\icon.ico"; DestDir: "{app}"
 
 [Run]
-Filename: {app}\mbs_uac.exe; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait
+Filename: cmd.exe; Parameters: "/C ""{app}\mbs_uac.exe""  "; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait runhidden
 Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd""  "; Description: Save the downloaded files to perform offline installation at a later time.; Flags: postinstall nowait unchecked runhidden runascurrentuser
 
 [UninstallDelete]
