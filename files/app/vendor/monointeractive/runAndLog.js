@@ -90,7 +90,7 @@ var runAndLog = function(initConfig){
 			scope.process.unref();
 		}
 		if(scope.process){
-			scope.process.stopCode = type;
+			scope.process.rejectCode = type;
 			scope.process.running = false;
 			scope.process.killed = true;
 			scope.process.pid = null;						
@@ -129,21 +129,21 @@ var runAndLog = function(initConfig){
 		scope.processWindow.show();
 		scope.log.append({message: [moment().format("YYYY-MM-DD HH:mm:ss"),'Start'].join(' | ')});
 		console.log('spawn',scope.config.id,{exec:scope.config.exec, args:scope.config.args, params:scope.config.params});
-		scope.process = spawn(scope.config.exec, scope.config.args, scope.config.params);
+		scope.process = (new processManager()).spawn(scope.config.exec, scope.config.args, scope.config.params);
 		var child = scope.process;
-		child.running = true;
 		console.log('child pid',child.pid);
-		if(child.stdout) {
-			child.stdout.on ('data',function(data){
-				scope.log.append({message:Buffer.from(data, 'utf-8').toString()});
-			});
-		}
-		if(child.stderr) child.stderr.on ('data',function(data){scope.log.append({error:true,message:Buffer.from(data, 'utf-8').toString()});}); 		 
+		child.on('stdout',function(message){
+			scope.log.append({message:message});
+		});
+		child.on('stderr',function(message){
+			scope.log.append({error:true, message:message});
+		});		
 		
-		child.once('reject',function(data){
+		child.once('exited',function(data){
+			console.log('spawn exited');
 			data.code = parseInt(data.code,10) || 0;
-			if(child.stopCode) data.code = child.stopCode;
-			scope.stop(child.stopCode);
+			if(child.rejectCode) data.code = child.rejectCode;
+			scope.stop(child.rejectCode);
 			
 			data.info = data.code,
 			data.isError = !(typeof data.code =='string' || !data.code);
@@ -155,21 +155,22 @@ var runAndLog = function(initConfig){
 			if(data.messsage) data.info = data.messsage;
 			scope.log.append({error: data.isError ,message: [moment().format("YYYY-MM-DD HH:mm:ss"),'The process was closed',data.info].join(' | ')});
 			scope.events.emit('reject',{reject:data,config:config});
-			console.log('reject',data,child);
+			console.log('exited',data,child);
 		});
-		
-		['error','close','exit','disconnect'].forEach(function(eventName){
+		child.once('reject',function(code){
+			child.emit('exited',{type:'exit',code:code});
+		});
+		['error','disconnect'].forEach(function(eventName){
 			child.on(eventName,function(data){
 				var result = {
 					type:eventName,
 					code:0					
 				}
-				if(eventName == 'close' || eventName == 'exit') result.code = data;
 				if(eventName == 'error') {
 					result.code = 1;
 					result.messsage = data.message ? util.format(data.message) : false
 				}
-				child.emit('reject',result);
+				child.emit('exited',result);
 			});
 		});		
 	}

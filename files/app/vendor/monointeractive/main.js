@@ -6,7 +6,7 @@ var main = new (function(){
 		scope.projects = config.data.projects;
 		scope.table.parent = scope;
 		scope.table.init();
-		scope.backupSettingsWindow();
+		//scope.backupSettingsWindow();
 		scope.inited = true; 
 		//$('.btn-edit').last().click();
 	}

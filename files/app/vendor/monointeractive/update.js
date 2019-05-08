@@ -4,7 +4,7 @@ var update = new runAndLog({
 	exec:path.join(execDir,'mbs_updater.exe'),
 	params:{
 		env:{
-			targetDir:path.join(execDir,'updates')
+			targetDir:path.join(execDir, (debugMode ? 'ignore\\updates' : 'updates'))
 		}
 	}
 });
@@ -12,7 +12,6 @@ var update = new runAndLog({
 update.events.on('start',function(){
 	tray.changeIcon('backup');	
 });
-
 update.events.on('reject',function(data){
 	if(fs.existsSync(path.join(execDir,'updates','mbs.exe'))){
 		try{
