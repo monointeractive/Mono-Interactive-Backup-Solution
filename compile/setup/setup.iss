@@ -41,7 +41,7 @@ begin
   offlineInstall := False;
   if FileExists(offlineDataPath) then
   begin
-	  if MsgBox('An offline installation file was detected. Do you want to use this file for installation without downloading components from the Internet?', mbConfirmation, MB_YESNO) = IDYES then
+	  if MsgBox('Do you want to use the previously downloaded version (may be out of date)?', mbConfirmation, MB_YESNO) = IDYES then
 	  begin
 		offlineInstall := True;
 	  end;
@@ -108,7 +108,7 @@ Source: "..\..\files\app\icons\icon.ico"; DestDir: "{app}"
 
 [Run]
 Filename: cmd.exe; Parameters: "/C ""{app}\mbs_uac.exe""  "; Description: Run {#_AppPublisher} {#_AppName}; Flags: postinstall nowait runhidden
-Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd""  "; Description: Save the downloaded files to perform offline installation at a later time.; Flags: postinstall nowait unchecked runhidden runascurrentuser
+Filename: cmd.exe; Parameters: "/C ""{#_tmp}\{#_downloadFileName}.offline.cmd""  "; Description: Create offline installation files.; Flags: postinstall nowait unchecked runhidden runascurrentuser
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
