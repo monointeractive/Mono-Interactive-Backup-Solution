@@ -3,12 +3,19 @@ var sync = new runAndLog({
 	id:'sync',
 	exec:path.join(binDir,'mbs_sync.exe'),
 	onBeforeStart:function(){
+		var serverConfig = extend(true,{},(config.data.server || {}));
 		this.config.userBackupDir = backup.getUserBackupDir();
 		this.config.syncBackupDir = path.dirname(this.config.userBackupDir);
 		var logDir = path.join(backup.getLogFileDir());
-		if(!fs.existsSync(logDir)) return showNotify({title:'No backup found in path ',message:this.config.userBackupDir});
-		var serverConfig = $.extend({},(config.data.server || {}));
-		if(typeof serverConfig.type =='string' && serverConfig.type.length && typeof serverConfig.user =='string' && serverConfig.user.length && typeof serverConfig.host =='string' && serverConfig.host.length){
+		if(!(serverConfig.type =='string' && serverConfig.type.length)){
+			showNotify({title:'Synchronization',message:'Synchronization is disabled'});
+			return false;
+		}
+		if(!fs.existsSync(logDir)) {
+			showNotify({title:'No backup found in path ',message:this.config.userBackupDir});
+			return false;
+		}
+		if(typeof serverConfig.user =='string' && serverConfig.user.length && typeof serverConfig.host =='string' && serverConfig.host.length){
 			this.config.params = {cwd:path.dirname(config.path),stdio: ['pipe']};			
 			var env = $.extend({},process.env);
 			env.logPath = path.join(logDir,'transfer-'+moment().format("YYYYMMDD")+'.log');
@@ -54,8 +61,8 @@ var sync = new runAndLog({
 });
 sync.events.on('start',function(){	
 	//$('.monobox').triggerHandler('hide');
-	tray.changeIcon('backup');	
+	//tray.changeIcon('backup');	
 });
 sync.events.on('reject',function(data){
-	tray.changeIcon(!((data.config || {}).backupRejectData || {}).isError && !data.reject.isError ? 'default' : 'warning');	
+	//tray.changeIcon(!((data.config || {}).backupRejectData || {}).isError && !data.reject.isError ? 'default' : 'warning');	
 });

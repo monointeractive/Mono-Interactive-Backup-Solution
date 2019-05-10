@@ -23,6 +23,9 @@
   -ms-user-select: none !important;
   user-select: none !important; }
 
+.advModeOnly {
+  display: none; }
+
 #dropZone {
   padding-top: 50px;
   padding-bottom: 50px;

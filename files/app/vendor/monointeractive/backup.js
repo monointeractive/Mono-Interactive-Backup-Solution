@@ -54,10 +54,10 @@ backup.getUserBackupDir = function(){
 }
 backup.events.on('start',function(){
 	console.log('start');
-	tray.changeIcon('backup');	
+	//tray.changeIcon('backup');	
 });
 
 backup.events.on('reject',function(data){
-	tray.changeIcon(!data.reject.isError ? 'default' : 'warning');	
+//	tray.changeIcon(!data.reject.isError ? 'default' : 'warning');	
 	if(data.reject.code !='userexit' && !win.closeCount) app.sync.start({backupRejectData:data.reject});
 });

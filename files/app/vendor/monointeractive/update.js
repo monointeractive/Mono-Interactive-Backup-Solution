@@ -10,7 +10,7 @@ var update = new runAndLog({
 });
  
 update.events.on('start',function(){
-	tray.changeIcon('backup');	
+	//tray.changeIcon('backup');	
 });
 update.events.on('reject',function(data){
 	if(fs.existsSync(path.join(execDir,'updates','mbs.exe'))){
@@ -18,5 +18,5 @@ update.events.on('reject',function(data){
 			fs.copyFileSync(path.join(execDir,'updates','mbs.exe'), path.join(execDir,'mbs.exe'));				
 		} catch(err){console.error(err);}
 	}
-	tray.changeIcon(!data.reject.isError ? 'default' : 'warning');	
+	//tray.changeIcon(!data.reject.isError ? 'default' : 'warning');	
 });

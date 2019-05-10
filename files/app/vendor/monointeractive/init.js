@@ -2,16 +2,36 @@ var nodeEnv = typeof require == 'function' && typeof require('nw.gui') !='undefi
 if(nodeEnv){	
 	var fs = require('fs');
 	var path = require('path');
+	var gui = require('nw.gui');
+	var guiApp = gui.App;
 	process.pids = [];
 	process.execPath = typeof process.env.execPath == 'string' && process.env.execPath.length && fs.existsSync(process.env.execPath) ? process.env.execPath : process.execPath;
 	process.execPath = typeof process.env.launcherPath == 'string' && process.env.launcherPath.length && fs.existsSync(process.env.launcherPath) ? process.env.launcherPath : process.execPath;
 	process.argv[0] = process.execPath;
-
-	console.log('process',process);
+	process.args = (([].concat(guiApp.fullArgv || [])).filter(function(arg){
+		var isExclude = false;
+		['--disable-raf-throttling', '--nwapp'].forEach(function(excludedArg){
+			if(arg.indexOf(excludedArg) == 0) isExclude = true;
+		});
+		return !isExclude;
+	}));
+	process.args = (function(args){
+		var withoutDuplicates = [];		
+		args.forEach(function(el){
+			if((el.indexOf('--') == -1 &&  el.indexOf('=') == -1) || withoutDuplicates.indexOf(el) == -1) withoutDuplicates.push(el);
+		});
+		return withoutDuplicates;
+	})(process.args);
+	
 	var util = require('util');
-	var gui = require('nw.gui');
 	var win = gui.Window.get();
-	var guiApp = gui.App;
+	if(!process.features.inspector) {
+		win.isDevToolsOpen = function(){
+			return true;
+		}
+		win.showDevTools = function(){console.log('Inspector is disabled');};
+	}
+		
 	var debugMode = process.execPath.toLowerCase().indexOf('e:\\') > -1 || process.execPath.toLowerCase().indexOf('narzedzia') > -1 || process.execPath.toLowerCase().indexOf('repo') > -1;
 	var devToolWindowRef = false;
 	
@@ -30,6 +50,7 @@ if(nodeEnv){
 	
 	win.show = function(){
 		if(main && main.splashWnd) main.splashWnd.close(true);
+		if(debugMode && !process.isExit) win.showDevTools();
 		this.orgShow();
 	}
 	
@@ -57,7 +78,7 @@ if(nodeEnv){
 		console.error('uncaughtException', err);
 		//if(typeof err == 'object') err = [err.name, err.message,err.stack];
 		
-		if(debugMode && typeof win == 'object' && win.showDevTools && ((win.isDevToolsOpen && !win.isDevToolsOpen()) || !win.isDevToolsOpen)){
+		if(debugMode && typeof win == 'object' && !win.isDevToolsOpen){
 			win.showDevTools();			
 		}
 		setTimeout(function(){process.exit();},60000);

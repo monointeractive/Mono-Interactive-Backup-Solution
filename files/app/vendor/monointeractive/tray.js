@@ -36,7 +36,21 @@ var tray = new (function(){
 		scope.iconDir = 'app/icons';
 		scope.iconName = 'default';
 		scope.changeIcon('default');
-	}	
+	}
+	scope.animationSets = {
+		default:['default'],
+		update:['update1','update2','update3','update1','update2','update3'],
+		backup:['backup2','backup3','backup4','backup2','backup3','backup4'],		
+		sync:['default','sync']
+	}
+	scope.updateIcon = function(){
+		var set = app.runningTakss.get();
+		set = (set[set.length - 1] || {}).configId;
+		if(scope.animationSets[set]) set = scope.animationSets[set]; else set = ['default'];
+		scope.changeIcon(set);
+		
+		//console.log(set);
+	}
 	scope.remove = function(){
 		if(scope.tray && scope.tray.remove) scope.tray.remove();
 	}
@@ -52,7 +66,11 @@ var tray = new (function(){
 		if(!scope.tray) return;
 		name = name || scope.iconName;
 		var _path = path.join(scope.iconDir,name+'.png');
-		if(_path !=scope.tray.icon) scope.tray.icon = _path;
+		if(_path !=scope.tray.icon) {
+			console.log('setIcon',_path);
+			scope.tray.icon = _path;
+			scope.tray.icon = _path;
+		}
 	}	
 	scope.changeIcon = function(sqguence){
 		if(typeof sqguence =='string' && sqguence =='warning'){
@@ -62,7 +80,7 @@ var tray = new (function(){
 		}
 		sqguence = sqguence || [];
 		if(typeof sqguence == 'string') sqguence = [sqguence];
-		scope.iconSequence = sqguence;
-		if(scope.iconSequence.indexOf(scope.iconName) == -1) scope.iconSequence.push(scope.iconName);		
+		scope.iconSequence = sqguence.length ? sqguence : [scope.iconName];	
+		console.log('changeIcon',scope.iconSequence);
 	}
 })();

@@ -2,12 +2,11 @@ var main = new (function(){
 	setTimeout(function(){},1);
 	var scope = this;
 	scope.init = function(){
-		scope.showSplash();
+		if(process.args.join().indexOf('restart-mode=true') == -1) scope.showSplash();
 		config.data.projects = config.data.projects && typeof config.data.projects == 'object' && config.data.projects.length ? config.data.projects : [];
 		scope.projects = config.data.projects;
 		scope.table.parent = scope;
 		scope.table.init();
-		//scope.backupSettingsWindow();
 		scope.inited = true; 
 		//$('.btn-edit').last().click();
 	}
@@ -15,7 +14,7 @@ var main = new (function(){
 		scope.splashWnd = nw.Window.open('app/splash.html', {width:550,height:330,resizable:false,always_on_top:true,show_in_taskbar:false,frame:false,show:false}, function(new_win) {
 			scope.splashWnd = new_win;			
 			setTimeout(function(){scope.splashWnd.show();},200);
-			setTimeout(function(){if(scope.splashWnd) scope.splashWnd.close(true);},10000);
+			setTimeout(function(){if(scope.splashWnd) scope.splashWnd.close(true);},7000);
 		});
 	}
 	scope.openLogsFolder = function(){
@@ -27,7 +26,7 @@ var main = new (function(){
 	scope.backupSettingsWindow = function(){
 		$(`<form>
 			<div class="row">
-				<div class="col">
+				<div class="col advModeOnly">
 					<div class="form-group">
 					  <label>Computer name</label>
 					  <input name="userdomain" type="text" data-onvalidate="if(this.value.length < 3) return 'Enter the name of this computer'" placeholder="Computer name" class="form-control">
@@ -41,19 +40,19 @@ var main = new (function(){
 				</div>				
 			</div>				
 			<div class="row">
-				<div class="col">
+				<div class="col advModeOnly">
 					<div class="form-group">
 					  <label>Wait for inactivity before running a copy</label>
 					  <select name="inactivityDelay" class="form-control"></select>
 					</div>
 				</div>
-				<div class="col">
+				<div class="col advModeOnly">
 					<div class="form-group">
 					  <label>Delete copies older than</label>
 					  <select name="deleteAfterDays" class="form-control"></select>
 					</div>
 				</div>			
-				<div class="col">
+				<div class="col advModeOnly">
 					<div class="form-group">
 					  <label>Force stop copying after</label>
 					  <select name="maxBackupExecutionTime" class="form-control"></select>
@@ -61,7 +60,7 @@ var main = new (function(){
 				</div>					
 			</div>						
 			<div class="row">
-				<div class="col">
+				<div class="col advModeOnly">
 					<div class="form-group">
 						<label>Local folder for saving copies</label>
 						<div class="input-group mb-3">
@@ -77,7 +76,7 @@ var main = new (function(){
 						<label>Launching the application during "${process.env.username}" logon (as a service)</label>
 						<div>
 							<button type="button" id="installService" class="btn btn-primary"><span class="fa fa-shield"></span>&nbsp;&nbsp;Create service</button>&nbsp;&nbsp;
-							<button type="button" id="removeService" class="btn btn-primary"><span class="fa fa-shield"></span>&nbsp;&nbsp;Remove service</button>
+							<button type="button" id="removeService" class="btn btn-primary advModeOnly"><span class="fa fa-shield"></span>&nbsp;&nbsp;Remove service</button>
 						</div>
 					</div>
 				</div>								
@@ -91,6 +90,16 @@ var main = new (function(){
 				fitToMaxWidth:true,
 				maxWidth:800,
 				buttons:[
+					{					
+						label: 'Advanced settings',
+						className: 'btn primary',
+						id:'adv',
+						callback: function(modal){	
+							$('.advModeOnly',form).removeClass('advModeOnly');
+							$(this).remove();
+							return false;
+						}
+					},			
 					{
 						label: 'Save',
 						className: 'btn primary',
@@ -111,15 +120,14 @@ var main = new (function(){
 			$('select[name=inactivityDelay]',form).each(function(idx,select){
 				var min = 60;
 				var hour = min * 60;
-				[min / 2 ,min,min *5,min * 10,min * 20,min * 30,hour,hour * 2,hour * 4, hour * 6].forEach(function(i){
+				[min / 4, min / 2 ,min,min *5,min * 10,min * 20,min * 30,hour,hour * 2,hour * 4, hour * 6].forEach(function(i){
 					$('<option>').each(function(idx,option){
 						if(option) value = humanizeDuration(i * 1000);
-						if(i == min * 20) {
-							value = value + ' (default)';
-						}
+						if(i == min * 10) value = value + ' (default)';
+						if(i < 60) value = value + ' (for test)';
 						$(option).attr('value',i).text(value);
 					}).appendTo(select);					
-					$(select).val(config.data.inactivityDelay || min * 20);
+					$(select).val(config.data.inactivityDelay || min * 10);
 				});
 			});
 			$('select[name=deleteAfterDays]',form).each(function(idx,select){
@@ -352,13 +360,33 @@ var main = new (function(){
 		}
 		project.accept = typeof project.accept == 'string' && project.accept.length ? project.accept : '*.*';
 		var saveAsNew = isNew;
+		var autoProjectName = function(dirPath){
+			var name = [];
+			var dirname = toTitleCase(String(path.basename(dirPath)));
+			var parentName =  toTitleCase(String(path.basename(path.dirname(dirPath))));
+			if(dirname.length) name.push(dirname);
+			if(parentName.length) name.push(parentName);
+			if(!name.length) name.push(toTitleCase(clearLink(dirPath).split('-').join(' ')));
+			return name.join(' in ');
+		};
 
 		$(`<form>
 			<div class="row">
 				<div class="col">
 					<div class="form-group">
+						<label>Location to backup</label>
+						<div class="input-group mb-3">
+							<input type="text" class="form-control" name="path" data-onvalidate="if(!this.value.isValidWindowsDirname()) return 'The path must exist and must be readable by the logged in user.';" placeholder="Select directory">
+							<div class="input-group-append"><a href="#" class="btn-browse-dir btn btn-lg btn-link"><span class="fa fa-fw fa-folder-open"></span></a></div>
+						</div>						
+					</div>
+				</div>								
+			</div>		
+			<div class="row advModeOnly">
+				<div class="col">
+					<div class="form-group">
 					  <label>Project name</label>
-					  <input name="name" type="text" data-onvalidate="if(this.value.length < 3) return 'Enter the name of the project'" placeholder="Project name" class="form-control">
+					  <input name="name" type="text" placeholder="Project name" class="form-control">
 					</div>
 				</div>
 				<div class="col">
@@ -376,18 +404,7 @@ var main = new (function(){
 			</div>
 			<div class="row">
 				<div class="col">
-					<div class="form-group">
-						<label>Folder to backup</label>
-						<div class="input-group mb-3">
-							<input type="text" class="form-control" name="path" data-onvalidate="if(!this.value.isValidWindowsDirname()) return 'The path must exist and must be readable by the logged in user.';" placeholder="Select directory">
-							<div class="input-group-append"><a href="#" class="btn-browse-dir btn btn-lg btn-link"><span class="fa fa-fw fa-folder-open"></span></a></div>
-						</div>						
-					</div>
-				</div>								
-			</div>
-			<div class="row">
-				<div class="col">
-					<label>Path filters</label>
+					<label>Location filters</label>
 					<span class="small">(wildcards support e.g.: *.txt, */docs/*.txt etc.)</span>
 				</div>
 			</div>
@@ -400,7 +417,7 @@ var main = new (function(){
 					  </table>
 					</div>
 				</div>
-				<div class="col">
+				<div class="col advModeOnly">
 					<div class="form-group">
 					  <label>Ignore <a title="Add" href="#" id="add-exclude" class="btn btn-add btn-sm"><span class="fa fa-fw fa-plus-circle"></span></a></label>
 					  <table id="exclude" class="recordTable table table-bordered table-striped table-hover table-sm">
@@ -418,6 +435,16 @@ var main = new (function(){
 				maxWidth:800,
 				buttons:(function(){
 					var buttons = [];
+					buttons.push({
+						label: 'Advanced settings',
+						className: 'btn primary',
+						id:'adv',
+						callback: function(modal){	
+							$('.advModeOnly',form).removeClass('advModeOnly');
+							$(this).remove();
+							return false;
+						}
+					});								
 					if(!isNew){						
 						buttons.push({
 							label: 'Save as new (clone)',
@@ -542,16 +569,18 @@ var main = new (function(){
 			
 			$('input[type=text]',form).each(function(idx,input){
 				var name = $(input).attr('name');
-				if(typeof project[name] !='undefined') $(input).val(project[name]);						
-			});
+				if(typeof project[name] !='undefined') $(input).val(project[name]).triggerHandler('change');
+			});			
 			
 			$(form).on('submit',function(e){
 				var result = false;
+				var data = $(form).serializeAssoc();	
+
 				$(form).mono('formValidator',{callback:function(data){
 					result = data.result;
 				}});
 				if(result){							
-					var data = $(form).serializeAssoc();	
+					if(!$.trim(data.name).length) data.name = autoProjectName(data.path);
 					data.maxFileSizeMb = _parseInt(data.maxFileSizeMb);					
 					data.maxZipFileSizeMb = _parseInt(data.maxZipFileSizeMb);					
 					data.accept = [];
@@ -564,7 +593,7 @@ var main = new (function(){
 					});
 					if(!data.accept.length) data.accept = '*.*';
 					
-					if(saveAsNew) scope.projects.push(extend(true,{},project,data)); else project = extend(true,project,data);
+					if(saveAsNew) scope.projects.push(extend(true,{},project,data,{enabled:false})); else project = extend(true,project,data);
 					config.save();
 					scope.table.reload();
 					$(modal).trigger('hide');					
@@ -668,6 +697,7 @@ var main = new (function(){
 })();
 
 $( document ).ready(function() {
+	if(process.isExit) return;
 	window.ondragover = function(e) { e.preventDefault(); return false };
 	window.ondrop = function(e) { e.preventDefault(); return false };
 	$('body').on('dblclick','.recordTable tr',function(e){
@@ -682,9 +712,7 @@ $('body').on('dragover',function(e){}).on('dragleave',function(e){}).on('drop',f
 			var files = [].slice.call(e.originalEvent.dataTransfer.files);
 			if(files.length) {
 				for (var i = 0; i < files.length; ++i){
-					var dirPath = files[i].path;
-					var dirName = toTitleCase(path.basename(dirPath)) + ' in ' + toTitleCase(path.basename(path.dirname(dirPath)));
-					if(dirPath.isValidWindowsDirname()) main.projectPropertiesWindow({name:dirName,path:dirPath},true,true);
+					if(files[i].path.isValidWindowsDirname()) main.projectPropertiesWindow({enabled:false,path:files[i].path},true,files.length > 1 ? true : false);
 				}					
 			}
 		}
@@ -696,7 +724,7 @@ $('body').on('dragover',function(e){}).on('dragleave',function(e){}).on('drop',f
 		if(!input) $(this).parents('.input-group').first().find('input').first().each(function(){input = this;});
 		$(input).each(function(){
 			openFileDialog({isDir:true,dir:$(input).val().length ? $(input).val() : config.data.lastDir || '',callback:function(files){
-				$(input).val(files[0].path);
+				$(input).val(files[0].path).triggerHandler('change');
 				config.data.lastDir = files[0].path;
 			}});
 		});
@@ -719,10 +747,7 @@ $('body').on('dragover',function(e){}).on('dragleave',function(e){}).on('drop',f
 			if(errors.length) showNotify({title:'Some fields need improvement',message:errors.join('<br>')});
 		}
 	});		
-	if(typeof win =='object' && debugMode && !process.isExit){
-		win.showDevTools();
-	}	
-	if(process.isExit) return;
+	
 	
 	config.init();
 	app.init();
@@ -736,15 +761,14 @@ $('body').on('dragover',function(e){}).on('dragleave',function(e){}).on('drop',f
 	});	
 	win.minimize();
 	var showDelay = debugMode ? 1000 : 5000;
-	setTimeout(function(){},1);
 	setTimeout(function(){
-		update.start(); 
-	},showDelay + 2000);
-	if(!config.data.lastSettingsSave || debugMode){
+		if(win.minimized) update.start(); 
+	},showDelay + 5000);
+	if((!config.data.lastSettingsSave || debugMode) && process.args.join(' ').indexOf('autorestart-mode=true') == -1){
 		setTimeout(function(){
 			win.show();
 			if(!config.data.lastSettingsSave) main.backupSettingsWindow();
 		},showDelay);		
 	}
-	app.initAutoExit();
+	app.initAutoRestart();
 });

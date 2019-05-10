@@ -82,20 +82,13 @@ var runAndLog = function(initConfig){
 		}
 	})(scope);
 	scope.isRunning = function(){
-		return ((scope.process && typeof scope.process.kill == 'function' && scope.process.pid) && scope.process.running);
+		return ((scope.process && typeof scope.process.kill == 'function' && scope.process.pid) && scope.process.running) ? true : false;
 	}
 	scope.stop = function(type){
 		if(scope.isRunning()){
 			console.log('killing',scope.config.id,scope.process);
-			scope.process.kill();
-			scope.process.unref();
-		}
-		if(scope.process){
-			scope.process.rejectCode = type;
-			scope.process.running = false;
-			scope.process.killed = true;
-			scope.process.pid = null;						
-		}		
+			scope.process.stop(type);
+		}	
 	}
 	scope.write = function(value){
 		
@@ -127,19 +120,36 @@ var runAndLog = function(initConfig){
 		}		
 		$('.monobox[data-window-id="'+scope.config.id+'"]').trigger('hide');		
 		scope.events.emit('start');
-		scope.processWindow.show().one('shown',function(){
-			scope.spawnAfterShow(config);
-		});
+		scope.processWindow.show();
+		return scope.spawn(config);
 	};
-	scope.spawnAfterShow = function(config){
+	scope.spawn = function(config){
 		scope.log.append({message: [moment().format("YYYY-MM-DD HH:mm:ss"),'Start'].join(' | ')});
-		scope.process = (new processManager()).spawn(scope.config.exec, scope.config.args, scope.config.params);			
+		scope.process = (new processManager()).spawn(scope.config.exec, scope.config.args, scope.config.params);					
 		var child = scope.process;
+		child.configId = scope.config.id;
+		if(child.pid) child.idx = app.runningTakss.add(scope.process);
 		console.log('child pid',child ? child.pid : null);
 		if(!child.pid){
 			showNotify({title:scope.config.title,message:'Process creation error'});
 			return;
 		}
+		
+		child.isRunning = function(){
+			return (typeof child.kill == 'function' && child.pid) && child.running;
+		}
+		child.stop = function(type){
+			if(child.isRunning()){
+				console.log('killing',scope.config.id,scope.process);
+				child.kill();
+				child.unref();
+			}
+			child.rejectCode = type;
+			child.running = false;
+			child.killed = true;
+			child.pid = null;								
+		}
+		
 		child.on('stdout',function(message){
 			scope.log.append({message:message});
 		});
@@ -163,6 +173,7 @@ var runAndLog = function(initConfig){
 			scope.log.append({error: data.isError ,message: [moment().format("YYYY-MM-DD HH:mm:ss"),'The process was closed',data.info].join(' | ')});
 			scope.events.emit('reject',{reject:data,config:config});
 			console.log('exited',data,child,config);
+			app.runningTakss.refresh();
 		});
 		child.once('reject',function(code){
 			child.emit('exited',{type:'exit',code:code});
@@ -180,6 +191,7 @@ var runAndLog = function(initConfig){
 				child.emit('exited',result);
 			});
 		});		
+		return child;
 	}
 	
 };
