@@ -49,7 +49,6 @@ var tray = new (function(){
 		if(scope.animationSets[set]) set = scope.animationSets[set]; else set = ['default'];
 		scope.changeIcon(set);
 		
-		//console.log(set);
 	}
 	scope.remove = function(){
 		if(scope.tray && scope.tray.remove) scope.tray.remove();
@@ -67,7 +66,6 @@ var tray = new (function(){
 		name = name || scope.iconName;
 		var _path = path.join(scope.iconDir,name+'.png');
 		if(_path !=scope.tray.icon) {
-			console.log('setIcon',_path);
 			scope.tray.icon = _path;
 			scope.tray.icon = _path;
 		}
@@ -81,6 +79,5 @@ var tray = new (function(){
 		sqguence = sqguence || [];
 		if(typeof sqguence == 'string') sqguence = [sqguence];
 		scope.iconSequence = sqguence.length ? sqguence : [scope.iconName];	
-		console.log('changeIcon',scope.iconSequence);
 	}
 })();

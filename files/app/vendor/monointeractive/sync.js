@@ -7,7 +7,7 @@ var sync = new runAndLog({
 		this.config.userBackupDir = backup.getUserBackupDir();
 		this.config.syncBackupDir = path.dirname(this.config.userBackupDir);
 		var logDir = path.join(backup.getLogFileDir());
-		if(!(serverConfig.type =='string' && serverConfig.type.length)){
+		if(!(typeof serverConfig.type =='string' && serverConfig.type.length)){
 			showNotify({title:'Synchronization',message:'Synchronization is disabled'});
 			return false;
 		}

@@ -4,7 +4,6 @@ var runAndLog = function(initConfig){
 	scope.events = new EventEmitter();
 	scope.init = function(){
 		if(scope.config.onInit) scope.config.onInit.call(scope);
-		console.log('name',this.constructor.name);
 		scope.log = new (function(){})();
 		scope.log.append = function(log){
 			var _this = this;
