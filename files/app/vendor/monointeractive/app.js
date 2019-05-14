@@ -47,7 +47,6 @@ var app = new (function(){
 			}			 
 		});
 		scope.events.on('user.idle',function(idleTime){
-			console.log('idleTime',idleTime);
 			win.setTitle();			
 			if(idleTime){
 				if(config.data.inactivityDelay && !backup.isRunning()){
