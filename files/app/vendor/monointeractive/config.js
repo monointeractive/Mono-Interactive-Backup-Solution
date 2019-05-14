@@ -21,25 +21,30 @@ var config = new (function(){
 				password:''
 			}
 		};
+		var loadFromFile = false;
 		if(scope.path && fs.existsSync(scope.path)) {
 			var data = {};
 			try{
 				var data = fs.readFileSync(scope.path, 'utf8');
 				data = JSON.parse(data);
 			} catch(err){console.error(err)};
-			if(data && typeof data =='object') scope.data = $.extend(true,{},scope.data,data);
+			if(data && typeof data =='object') {
+				loadFromFile = true;
+				scope.data = $.extend(true,{},scope.data,data);
+			}
 		}
 		scope.data = typeof scope.data == 'object' ? scope.data : {};
 		var currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
 		if(!scope.data.firstRun) scope.data.firstRun = currentDate;
 		scope.data.lastRun = currentDate;
 		console.log('config','load',scope.path,scope.data);
-		scope.save();
+		if(!loadFromFile) scope.save();
 	}
 	scope.save = function(){		
 		if(scope.path) {
-			console.log('config','save',scope.path,scope.data);
-			fs.writeFileSync(scope.path, JSON.stringify($.extend(true,{},(scope.data || {})),null,3),'utf8');
+			var json = JSON.stringify($.extend(true,{},(scope.data || {})),null,3);
+			console.log('config','save',JSON.parse(json));
+			fs.writeFileSync(scope.path, json ,'utf8');
 		}
 	}
 });
